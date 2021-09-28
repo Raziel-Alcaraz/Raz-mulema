@@ -19,6 +19,28 @@
      register_post_type( 'book', ['public' => true ] );
  }
  add_action( 'init', 'mulema_setup_post_type' );
+ 
+ add_action( 'init', 'process_post' );
+ 
+function process_post() {
+     if( isset( $_POST['mulema_user_to_add'] ) ) {
+         $user = $array = array(
+    'user_pass' => $_POST['mulema_user_pass'],
+    'user_login' => $_POST['mulema_user_to_add'],
+    'user_email' => $_POST['mulema_user_mail'],
+    'display_name' => $_POST['display_name'],
+    'role'  => $_POST['mulema_user_role']       
+);
+        $userId = wp_insert_user($user);
+        echo "Agregado un usuario con ID: ". $userId;
+         update_user_meta( $userId, "Nominador", get_current_user_id());
+         
+     }else{
+        // echo "array: ".implode(",",$_POST);
+     }
+}
+ 
+ 
 /**
   * Register the embajador, cliente and lider custom user types
   */
@@ -227,6 +249,7 @@ $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
         display: inline-block;
       margin: auto;
     height: 12vh;
+    min-height: 95px;
     width: 25vw;
     max-width: 120px;
     background: #208171;
@@ -428,6 +451,33 @@ canvas{
     <canvas height="200px" width="200px" id="myChart2" style="height:300px; width:300px;display: inline-block;"></canvas>
 </div>
 </div>
+
+        
+        
+<div id="mulema-agregar" class="centrar">
+    <form method="post">
+            <h2>Agregar cliente</h2> 
+            <p> Login: <br><input name="mulema_user_to_add" type="text"/></p>
+            <p>Contraseña: <br><input name='mulema_user_pass' type="text"/></p>
+            <p>Email: <br><input name="mulema_user_mail" type="text"/></p>
+            <p>Nombre: <br><input name="display_name" type="text"/></p>
+            <input hidden name="mulema_user_role" value="Cliente"/>
+            <br><br><button class="mul-botonCobrar" type="submit">Agregar</button>
+            <br><br>
+    </form>
+</div>    
+<div id="mulema-agregar2" class="centrar">
+    <form method="post">
+            <h2>Agregar Embajada</h2> 
+            <p> Login: <br><input name="mulema_user_to_add" type="text"/></p>
+            <p>Contraseña: <br><input name='mulema_user_pass' type="text"/></p>
+            <p>Email: <br><input name="mulema_user_mail" type="text"/></p>
+            <p>Nombre: <br><input name="display_name" type="text"/></p>
+            <input hidden name="mulema_user_role" value="Embajador"/>
+            <br><br><button class="mul-botonCobrar" type="submit">Agregar</button>
+            <br><br>
+    </form>
+</div> 
         <div id="mulema-datos" class="centrar">
             <h2> Mis datos bancarios  </h2> 
             Cuenta: <input type="text" value="121212121212"/>
@@ -509,6 +559,8 @@ type: 'polarArea',
  </div>
 <?php
 }
+
+
 function mulema_embajada_panel(){
    $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
      echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
@@ -690,6 +742,7 @@ function mulema_embajada_panel(){
     display: inline-block;
     margin: auto;
     height: 12vh;
+    min-height: 95px;
     width: 25vw;
     max-width: 120px;
     background: #208171;
@@ -891,6 +944,20 @@ canvas{
     <canvas height="200px" width="200px" id="myChart2" style="height:300px; width:300px;display: inline-block;"></canvas>
 </div>
 </div>
+<div id="mulema-agregar" class="centrar">
+    <form method="post">
+            <h2>Agregar cliente</h2> 
+            <p> Login: <br><input name="mulema_user_to_add" type="text"/></p>
+            <p>Contraseña: <br><input name='mulema_user_pass' type="text"/></p>
+            <p>Email: <br><input name="mulema_user_mail" type="text"/></p>
+            <p>Nombre: <br><input name="display_name" type="text"/></p>
+            <input hidden name="mulema_user_role" value="Cliente"/>
+            <br><br><button class="mul-botonCobrar" type="submit">Agregar</button>
+            <br><br>
+    </form>
+</div> 
+        
+        
         <div id="mulema-datos" class="centrar">
             <h2> Mis datos bancarios  </h2> 
             Cuenta: <input type="text" value="121212121212"/>
