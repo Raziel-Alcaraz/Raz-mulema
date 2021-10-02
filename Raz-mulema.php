@@ -34,9 +34,29 @@ function process_post() {
         $userId = wp_insert_user($user);
         echo "Agregado un usuario con ID: ". $userId;
          update_user_meta( $userId, "Nominador", get_current_user_id());
+         update_user_meta( $userId, "Ingreso", date("l jS \de F \de Y h:i:s A", time()));
+         update_user_meta( $userId, "Foto", "https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png");
          
-     }else{
-        // echo "array: ".implode(",",$_POST);
+         
+       //TODO: editar foto subida  
+         
+     }else if ( isset( $_POST['mulema_update_clabe'] ) ){
+        echo "Datos cambiados: CLABE";
+         update_user_meta( get_current_user_id(), "Clabe", $_POST['mulema_update_clabe']);
+     
+     }else if ( isset( $_FILES['mulema_photo_change'] ) ){
+         if ( ! function_exists( 'wp_handle_upload' ) ) {
+    require_once( ABSPATH . 'wp-admin/includes/file.php' );
+}
+        
+      $retorno =  wp_handle_upload( $_FILES['mulema_photo_change'], array('test_form' => FALSE) , null );
+      echo "Cambiada la foto";
+      var_dump($retorno);
+         update_user_meta( get_current_user_id(), "Foto", $retorno);
+          update_user_meta( get_current_user_id(), "Foto", "none");
+     }
+     else{
+    
      }
 }
  
@@ -63,6 +83,8 @@ function process_post() {
  add_action( 'init', 'mulema_setup_user_types' );
  
  
+
+
  function mulema_add_panels() {
    add_menu_page( 'Lider', 'Lider', 'manage_options', 'mulema_p0', 'mulema_lider_panel' );
  add_menu_page( 'Embajada', 'Embajada', 'manage_options', 'mulema_p1', 'mulema_embajada_panel' );
@@ -73,251 +95,26 @@ $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
  $ventasUsr = "$137,000";
  $gananciasUsr = "$13,700";
     ?>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 <style>
-    #mulema-caratula{
-        height: 100vh;
-    } 
-    #mulema-carSup{
-        height: 50vh;
-        min-height: 370px;
-    }
-    #mulemaHola{
-        width: 75%;
-        color: white;
-        display: inline;
-        left: 2px;
-        position: relative;
-    }
-    #mulemaLogo{
-         width: 25%;
-    }
-    #mulema-imagenLogo{
-         max-width: 25vw;
-         display: inline;
-         position: absolute;
-         right: 2px;
-         width: 40px;
-    }
-    #fotoPerfil{
-         max-width: 65vw;
-         display: block;
-         position: relative;
-         margin: 0 auto;
-         width: 120px;
-         height: 120px;
-         border-radius: 50%;
-         border: 2px solid black;
-    }
-    #fotoPerfilContainer{
-         max-width: 75vw;
-         display: block;
-         position: relative;
-         margin: 0 auto;
-         width: 124px;
-         height: 124px;
-         border-radius: 50%;
-         border: 1px solid white;
-         margin-top: 8vh;
-         margin-bottom: 10vh;
-    }
-    #mulCarSup3{
-        display: block;
-        width: 100vw;
-        margin-bottom: 10px;
-    }
-     #mulema-carInf{
-        min-height: 50vh;
-        border-top-right-radius: 16px;
-        border-top-left-radius: 16px;
-        background-color: white;
-    }
-    .mulLeftHalf{
-        display: inline-block;
-        width: 49%;
-        color: white;
-        text-align: center;
-    }
-    .mulRightHalf{
-        display: inline-block;
-         width: 49%;
-          color: white;
-         text-align: center;
-    }
-    .mulermaResaltarCentrar{
-        text-align: center;
-        font-weight: bolder;
-        font-size: x-large;
-        color: white;
-        display: block;
-    }
-    .mulCarSup3in{
-        font-weight: lighter;
-        font-size: small;
-    }
-    body{
-        background-color: #000000;
-    }
-    #wpcontent{
-        padding-left: 0px !important;
-         padding-right: 0px !important;
-    }
-    #mul-botonCobrarCont{
-        display: block;
-        text-align: center;
-    }
-    #mul-botonCobrar{
-        display: block;
-      margin: 0 auto;
-    transform: translate(0, -50%);
+   <?php
+include('other.php');
 
-    width: 161px;
-    background: #208171;
-    border-radius: 8px;
-   /* border: 1px white solid; */
-    padding: 5px;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    border:none;
-    }
-    
-      
-     #mul-botonCobrar a{
-      color: white;  
-      
-      width:150px;
-      border-radius: 6px;
-    border: 1px white solid;
-    display:block;
-    padding: auto;
-    padding-top: 15px;
-    padding-bottom: 15px;
-     }
-     .mul-botonCobrar{
-        display: block;
-      margin: 0 auto;
-    transform: translate(0, -50%);
-
-    width: 161px;
-    background: #208171;
-    border-radius: 8px;
-   /* border: 1px white solid; */
-    padding: 5px;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    border:none;
-    }
-    
-      
-     .mul-botonCobrar a{
-      color: white;  
-      
-      width:150px;
-      border-radius: 6px;
-    border: 1px white solid;
-    display:block;
-    padding: auto;
-    padding-top: 15px;
-    padding-bottom: 15px;
-     }
-     #mulema-mitadPortada{
-         height: 50vh;
-         width: 400px;
-         max-width: 95vw;
-         margin:auto;
-         display: block;
-     }
-     .mulema-cargo{
-         color:gray;
-         
-     }
-     .mulema-username{
-        font-weight: bolder;
-        font-size: x-large;
-        color: black;
-     }
-     .triplesCont{
-         width: 100%;
-         margin: auto;
-          text-align: justify;
-  -ms-text-justify: distribute-all-lines;
-  text-justify: distribute-all-lines;
-     }
-     .triples{
-        display: inline-block;
-      margin: auto;
-    height: 12vh;
-    min-height: 95px;
-    width: 25vw;
-    max-width: 120px;
-    background: #208171;
-    border-radius: 16px;
-   /* border: 1px white solid; */
-    padding: 0vw;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    border:none;
-    }
-    .triplgrande{
-      font-weight: bold;
-        font-size: xx-large; 
-        padding:0;
-        margin: 0;
-    }
-    .stretch {
-  width: 100%;
-  display: inline-block;
-  font-size: 0;
-  line-height: 0
-}
-.styled-table {
-    border-collapse: collapse;
-    margin: 30px auto;
-    font-size: large;
-    font-family: sans-serif;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-}
-.styled-table thead tr {
-    background-color: #208171;
-    color: #ffffff;
-    text-align: left;
-}
-.styled-table th,
-.styled-table td {
-    padding: 12px 15px;
-}
-.styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-}
-
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-}
-
-.styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
-}
-.styled-table tbody tr.active-row {
-    font-weight: bold;
-    color: #009879;
-}
-.centrar{
-    text-align: center;
-}
-canvas{
-    margin: 20px auto;
-}
+?>
 </style>
 <div id="mulema-caratula">
     <div id="mulema-carSup">
         <h2 id='mulemaHola'>Hola, Líder</h2>
         <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
         <div id="fotoPerfilContainer">
-        <img id="fotoPerfil" src ="https://viveelite.com/wp-content/uploads/2021/09/WhatsApp-Image-2021-09-02-at-16.52.47-2.jpeg"/>
+     
+             
+         <img id="fotoPerfil" src ="https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png"  onclick="$('#imgupload').trigger('click'); return false;"/>
+        <form  method="post">
+        <input type="file" id="imgupload" onchange="$('#mandarFoto').trigger('click');" name="mulema_photo_change" hidden>
+        <input type="submit" id="mandarFoto" hidden/>
+        </form>
         </div>
         <div id="mulCarSup3">
             <div class="mulLeftHalf">
@@ -466,6 +263,7 @@ canvas{
             <br><br>
     </form>
 </div>    
+        <!--
 <div id="mulema-agregar2" class="centrar">
     <form method="post">
             <h2>Agregar Embajada</h2> 
@@ -477,11 +275,29 @@ canvas{
             <br><br><button class="mul-botonCobrar" type="submit">Agregar</button>
             <br><br>
     </form>
-</div> 
-        <div id="mulema-datos" class="centrar">
-            <h2> Mis datos bancarios  </h2> 
-            Cuenta: <input type="text" value="121212121212"/>
-            <br><br><button class="mul-botonCobrar" type="submit">Enviar</button>
+</div> -->
+       
+        <div id="mulema-datos" class="justificar">
+            <h2> Mis datos  </h2> 
+            <hr/>
+            <h4>Datos bancarios</h4>
+            <p>Cuenta bancaria: <input type="text" value="<?php
+            $clabe_mul = get_user_meta( get_current_user_id(), "Clabe", true );
+           
+            echo $clabe_mul; ?>"/></p>
+            <br><br>
+            <div class="centrar"><button class="mul-botonCobrar" type="submit">Enviar</button></div>
+            <hr/>
+            <h4>Información de mi red</h4>
+            <p> Nominado por: <?php
+            $nominador_mul = get_user_meta( get_current_user_id(), "Nominador", true );
+            $nominador_mul_texto = get_user_by('id',$nominador_mul);
+            echo $nominador_mul_texto; ?></p><br>
+            <p> Registro en la plataforma: <?php
+            $nominador_mul = get_user_meta( get_current_user_id(), "Ingreso", true );
+            $nominador_mul_texto = get_user_by('id',$nominador_mul);
+            echo $nominador_mul_texto; ?></p>
+            <p><?php var_dump( get_user_meta( get_current_user_id(), "Foto", true ));  ?></p>
             <br><br>
         </div>
 <script>
@@ -568,249 +384,33 @@ function mulema_embajada_panel(){
  $gananciasUsr = "$13,700";
     ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <style>
-    #mulema-caratula{
-        height: 100vh;
-    } 
-    #mulema-carSup{
-        height: 50vh;
-        min-height: 370px;
-    }
-    #mulemaHola{
-        width: 75%;
-        color: white;
-        display: inline;
-        left: 2px;
-        position: relative;
-    }
-    #mulemaLogo{
-         width: 25%;
-    }
-    #mulema-imagenLogo{
-         max-width: 25vw;
-         display: inline;
-         position: absolute;
-         right: 2px;
-         width: 40px;
-    }
-    #fotoPerfil{
-         max-width: 65vw;
-         display: block;
-         position: relative;
-         margin: 0 auto;
-         width: 120px;
-         height: 120px;
-         border-radius: 50%;
-         border: 2px solid black;
-    }
-    #fotoPerfilContainer{
-         max-width: 75vw;
-         display: block;
-         position: relative;
-         margin: 0 auto;
-         width: 124px;
-         height: 124px;
-         border-radius: 50%;
-         border: 1px solid white;
-         margin-top: 8vh;
-         margin-bottom: 10vh;
-    }
-    #mulCarSup3{
-        display: block;
-        width: 100vw;
-        margin-bottom: 10px;
-    }
-     #mulema-carInf{
-        min-height: 50vh;
-        border-top-right-radius: 16px;
-        border-top-left-radius: 16px;
-        background-color: white;
-    }
-    .mulLeftHalf{
-        display: inline-block;
-        width: 49%;
-        color: white;
-        text-align: center;
-    }
-    .mulRightHalf{
-        display: inline-block;
-         width: 49%;
-          color: white;
-         text-align: center;
-    }
-    .mulermaResaltarCentrar{
-        text-align: center;
-        font-weight: bolder;
-        font-size: x-large;
-        color: white;
-        display: block;
-    }
-    .mulCarSup3in{
-        font-weight: lighter;
-        font-size: small;
-    }
-    body{
-        background-color: #000000;
-    }
-    #wpcontent{
-        padding-left: 0px !important;
-         padding-right: 0px !important;
-    }
-    #mul-botonCobrarCont{
-        display: block;
-        text-align: center;
-    }
-    #mul-botonCobrar{
-        display: block;
-      margin: 0 auto;
-    transform: translate(0, -50%);
+<?php
+include('other.php');
 
-    width: 161px;
-    background: #208171;
-    border-radius: 8px;
-   /* border: 1px white solid; */
-    padding: 5px;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    border:none;
-    }
-    
-      
-     #mul-botonCobrar a{
-      color: white;  
-      
-      width:150px;
-      border-radius: 6px;
-    border: 1px white solid;
-    display:block;
-    padding: auto;
-    padding-top: 15px;
-    padding-bottom: 15px;
-     }
-     .mul-botonCobrar{
-        display: block;
-      margin: 0 auto;
-    transform: translate(0, -50%);
-
-    width: 161px;
-    background: #208171;
-    border-radius: 8px;
-   /* border: 1px white solid; */
-    padding: 5px;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    border:none;
-    }
-    
-      
-     .mul-botonCobrar a{
-      color: white;  
-      
-      width:150px;
-      border-radius: 6px;
-    border: 1px white solid;
-    display:block;
-    padding: auto;
-    padding-top: 15px;
-    padding-bottom: 15px;
-     }
-     #mulema-mitadPortada{
-         height: 50vh;
-         width: 400px;
-         max-width: 95vw;
-         margin:auto;
-         display: block;
-     }
-     .mulema-cargo{
-         color:gray;  
-     }
-     .mulema-username{
-        font-weight: bolder;
-        font-size: x-large;
-        color: black;
-     }
-     .triplesCont{
-        width: 100%;
-         margin: auto;
-          text-align: justify;
-  -ms-text-justify: distribute-all-lines;
-  text-justify: distribute-all-lines;
-     }
-     .triples{
-    display: inline-block;
-    margin: auto;
-    height: 12vh;
-    min-height: 95px;
-    width: 25vw;
-    max-width: 120px;
-    background: #208171;
-    border-radius: 16px;
-   /* border: 1px white solid; */
-    padding: 0vw;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    border:none;
-    }
-    .triplgrande{
-      font-weight: bold;
-        font-size: xx-large; 
-        padding:0;
-        margin: 0;
-    }
-    .stretch {
-  width: 100%;
-  display: inline-block;
-  font-size: 0;
-  line-height: 0
-}
-.styled-table {
-    border-collapse: collapse;
-    margin: 30px auto;
-    font-size: large;
-    font-family: sans-serif;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-}
-.styled-table thead tr {
-    background-color: #208171;
-    color: #ffffff;
-    text-align: left;
-}
-.styled-table th,
-.styled-table td {
-    padding: 12px 15px;
-}
-.styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-}
-
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-}
-
-.styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
-}
-.styled-table tbody tr.active-row {
-    font-weight: bold;
-    color: #009879;
-}
-.centrar{
-    text-align: center;
-}
-canvas{
-    margin: 20px auto;
-}
+?>
 </style>
 <div id="mulema-caratula">
+     <script>
+$('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });   
+         </scipt>
     <div id="mulema-carSup">
         <h2 id='mulemaHola'>Hola, Embajador(a)</h2>
         <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
         <div id="fotoPerfilContainer">
-        <img id="fotoPerfil" src ="https://viveelite.com/wp-content/uploads/2018/12/team3-free-img.png"/>
+     
+             
+         <img id="fotoPerfil" src ="https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png"  onclick="$('#imgupload').trigger('click'); return false;"/> 
+        
+        <div class="wrapper" hidden> 
+        
+        
+        <form method="post">
+     <input type="file" id="imgupload" onchange="$('#mandarFoto').trigger('click');" name="mulema_photo_change" hidden>
+        <input type="submit" id="mandarFoto" hidden/>
+    </form>
+</div>
         </div>
         <div id="mulCarSup3">
             <div class="mulLeftHalf">
@@ -1040,7 +640,7 @@ type: 'polarArea',
 <?php
 
 }
- add_action( 'init', 'mulema_add_panels' );
+ add_action( 'admin_menu', 'mulema_add_panels' );
  
  function mulema_chartjs(){
       $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
