@@ -21,30 +21,80 @@
  add_action( 'init', 'mulema_setup_post_type' );
  
  add_action( 'init', 'process_post' );
- 
+ add_filter('pre_option_default_role', function($default_role){
+    // You can also add conditional tags here and return whatever
+    return 'Cliente'; // This is changed
+    return $default_role; // This allows default
+});
 function process_post() {
      if( isset( $_POST['mulema_user_to_add'] ) ) {
+         if($_POST['mulema_user_role'] == "Lider"){
+         $cargo = "GERENTE REGIONAL";
+       }  
+       else if($_POST['mulema_user_role'] == "Embajador"){
+         $cargo = "EMBAJADOR(A) REGIONAL";
+       } else  
+           if($_POST['mulema_user_role'] == "Cliente"){
+         $cargo = "USUARIO VIP";
+       } 
+       $current_user = wp_get_current_user();
+         $descripcion = $_POST['first_name']. " ".$_POST['last_name'].
+                 " es un(a) ".$cargo. " recomendado(a) por " .$current_user->user_firstname." ".$current_user->user_lastname.
+                 " con fecha de ingreso: ".date("jS F Y h:i:s A", time());
+         
          $user = $array = array(
     'user_pass' => $_POST['mulema_user_pass'],
     'user_login' => $_POST['mulema_user_to_add'],
     'user_email' => $_POST['mulema_user_mail'],
-    'display_name' => $_POST['display_name'],
-    'role'  => $_POST['mulema_user_role']       
+    'display_name' => $_POST['first_name']. " ".$_POST['last_name'],
+    'first_name' => $_POST['first_name'],
+    'last_name'  => $_POST['last_name'],
+    'role'  => $_POST['mulema_user_role'],
+    'show_admin_bar_front'  =>true,
+    'description' => $descripcion         
 );
         $userId = wp_insert_user($user);
+       
         echo "Agregado un usuario con ID: ". $userId;
          update_user_meta( $userId, "Nominador", get_current_user_id());
          update_user_meta( $userId, "Ingreso", date("l jS \de F \de Y h:i:s A", time()));
          update_user_meta( $userId, "Foto", "https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png");
          
-         
+       if($_POST['mulema_user_role'] == "Embajador"){
+          update_user_meta( $userId, "Cargo", "EMBAJADOR(A) REGIONAL");
+          update_user_meta( $userId, "Lider", get_current_user_id());
+       }  
+       else if($_POST['mulema_user_role'] == "Cliente"){
+          update_user_meta( $userId, "Cargo", "USUARIO VIP");
+          update_user_meta( $userId, "Lider", get_user_meta(get_current_user_id(),"Nominador", true));
+          update_user_meta( $userId, "Embajador", get_current_user_id());
+       } 
        //TODO: editar foto subida  
          
      }else if ( isset( $_POST['mulema_update_clabe'] ) ){
         echo "Datos cambiados: CLABE";
          update_user_meta( get_current_user_id(), "Clabe", $_POST['mulema_update_clabe']);
      
-     }else if ( isset( $_FILES['mulema_photo_change'] ) ){
+     }else if ( isset( $_POST['mulema_update_cp'] ) ){
+        echo "Datos cambiados: CP";
+         update_user_meta( get_current_user_id(), "CP", $_POST['mulema_update_cp']);
+     
+     }else if ( isset( $_POST['mulema_update_addr'] ) ){
+        echo "Datos cambiados: Addr";
+         update_user_meta( get_current_user_id(), "Addr", $_POST['mulema_update_addr']);
+     
+     }
+     else if ( isset( $_POST['mulema_update_city'] ) ){
+        echo "Datos cambiados: City";
+         update_user_meta( get_current_user_id(), "City", $_POST['mulema_update_city']);
+     
+     }
+     else if ( isset( $_POST['mulema_update_region'] ) ){
+        echo "Datos cambiados: region";
+         update_user_meta( get_current_user_id(), "Region", $_POST['mulema_update_region']);
+     
+     }
+     else if ( isset( $_FILES['mulema_photo_change'] ) ){
          if ( ! function_exists( 'wp_handle_upload' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/file.php' );
 }
@@ -55,8 +105,12 @@ function process_post() {
          update_user_meta( get_current_user_id(), "Foto", $retorno);
           update_user_meta( get_current_user_id(), "Foto", "none");
      }
+     else if ( isset( $_POST['generarceseve'] ) ){
+        // echo "escribiendo csv";
+         escribir_csv();
+     }
      else{
-    
+    //echo "------------nada-------";
      }
 }
  
@@ -67,17 +121,22 @@ function process_post() {
  function mulema_setup_user_types() {
  $role = "Lider";
  $display_name = "Lider";
- $capabilities = array();
-     add_role( $role, $display_name, $capabilities );
+ $capabilitiesLid = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>true, 
+     'view_admin_dashboard' =>true, 'mulema_lider'=>true );
+ $capabilitiesCli = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>true, 
+     'view_admin_dashboard' =>true );
+ $capabilitiesEmb = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>true, 
+     'view_admin_dashboard' =>true, 'mulema_embajada'=>true );
+     add_role( $role, $display_name, $capabilitiesLid );
      
  $role = "Embajador";
  $display_name = "Embajador";
- $capabilities = array();
-     add_role( $role, $display_name, $capabilities );
+
+     add_role( $role, $display_name, $capabilitiesEmb );
  $role = "Cliente";
  $display_name = "Usuario";
- $capabilities = array();
-     add_role( $role, $display_name, $capabilities );    
+
+     add_role( $role, $display_name, $capabilitiesCli );    
  }
  
  add_action( 'init', 'mulema_setup_user_types' );
@@ -86,294 +145,16 @@ function process_post() {
 
 
  function mulema_add_panels() {
-   add_menu_page( 'Lider', 'Lider', 'manage_options', 'mulema_p0', 'mulema_lider_panel' );
- add_menu_page( 'Embajada', 'Embajada', 'manage_options', 'mulema_p1', 'mulema_embajada_panel' );
+   add_menu_page( 'Líder', 'Líder', 'mulema_lider', 'mulema_p0', 'mulema_lider_panel' );
+ add_menu_page( 'Embajador', 'Embajador', 'mulema_embajada', 'mulema_p1', 'mulema_embajada_panel' );
+  add_menu_page( 'Superadmin', 'Superadmin', 'manage_options', 'mulema_p2', 'mulema_superadmin_panel' );
  }
  function mulema_lider_panel(){
 $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
      echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
  $ventasUsr = "$137,000";
  $gananciasUsr = "$13,700";
-    ?>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-<style>
-   <?php
-include('other.php');
-
-?>
-</style>
-<div id="mulema-caratula">
-    <div id="mulema-carSup">
-        <h2 id='mulemaHola'>Hola, Líder</h2>
-        <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
-        <div id="fotoPerfilContainer">
-     
-             
-         <img id="fotoPerfil" src ="https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png"  onclick="$('#imgupload').trigger('click'); return false;"/>
-        <form  method="post">
-        <input type="file" id="imgupload" onchange="$('#mandarFoto').trigger('click');" name="mulema_photo_change" hidden>
-        <input type="submit" id="mandarFoto" hidden/>
-        </form>
-        </div>
-        <div id="mulCarSup3">
-            <div class="mulLeftHalf">
-            <div class="mulermaResaltarCentrar"><?php echo $ventasUsr; ?></div>
-            <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
-            </div>
-            <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo $gananciasUsr; ?></div>
-              <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
-            </div>
-        </div>
-    </div>
-    <div id="mulema-carInf">
-        <div id="mul-botonCobrarCont"><button id="mul-botonCobrar"><a>COBRAR</a></button></div>
-        <div id="mulema-mitadPortada">
-            <p class="mulema-cargo">GERENTE REGIONAL</p>
-            <p class="mulema-username">Líder Deprueba</p>
-            <p  class="mulema-cargo"><i class="bi bi-telephone-fill"></i> 5572667744</p>
-            <div class="triplesCont">
-                <div class="triples">
-                    <p class="triplgrande">12</p>
-                    <p class="triplchico">PEDIDOS</p>
-                </div>
-                <div class="triples">
-                    <p class="triplgrande">34</p>
-                    <p class="triplchico">VENTAS</p>
-                </div>
-                <div class="triples">
-                    <p class="triplgrande">56</p>
-                    <p class="triplchico">PRODUCTOS</p>
-                </div>
-                 <span class="stretch"></span>
-            </div>
-        </div>
-        <div id="mulemaListas">
-            <table class="styled-table">
-    <thead>
-        <tr>
-            <th class="centrar" colspan="3">Embajadores TOP</th>
-            
-        </tr>
-        <tr>
-            <th>Nombre</th>
-            <th>Ventas</th>
-            <th>Comisiones</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Embajador1</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador2</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Embajador3</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador4</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Embajador5</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador6</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Embajador7</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-    </tbody>
-</table>
-
-        <table class="styled-table">
-    <thead>
-        <tr>
-            <th class="centrar" colspan="3">Nuevas incorporaciones</th>
-            
-        </tr>
-        <tr>
-            <th>Nombre</th>
-            <th>Tiempo</th>
-            <th>Ventas</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Embajador11</td>
-            <td>3 días</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador12</td>
-            <td>5 días</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Embajador13</td>
-            <td>14 días</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador4</td>
-            <td>51 días</td>
-            <td>51500</td>
-        </tr>
-       
-    </tbody>
-</table>           
-            
-        </div>
-<div id="mulema-graficas">
-<div height="100px">
-<canvas id="myChart" style="height:40vh; width:80vw"></canvas>
-</div>
-<h2>Regiones</h2>
-<div style="position: relative; height:300px; width:300px; display: inline"  height="300px">
-    <canvas height="200px" width="200px" id="myChart2" style="height:300px; width:300px;display: inline-block;"></canvas>
-</div>
-</div>
-
-        
-        
-<div id="mulema-agregar" class="centrar">
-    <form method="post">
-            <h2>Agregar cliente</h2> 
-            <p> Login: <br><input name="mulema_user_to_add" type="text"/></p>
-            <p>Contraseña: <br><input name='mulema_user_pass' type="text"/></p>
-            <p>Email: <br><input name="mulema_user_mail" type="text"/></p>
-            <p>Nombre: <br><input name="display_name" type="text"/></p>
-            <input hidden name="mulema_user_role" value="Cliente"/>
-            <br><br><button class="mul-botonCobrar" type="submit">Agregar</button>
-            <br><br>
-    </form>
-</div>    
-        <!--
-<div id="mulema-agregar2" class="centrar">
-    <form method="post">
-            <h2>Agregar Embajada</h2> 
-            <p> Login: <br><input name="mulema_user_to_add" type="text"/></p>
-            <p>Contraseña: <br><input name='mulema_user_pass' type="text"/></p>
-            <p>Email: <br><input name="mulema_user_mail" type="text"/></p>
-            <p>Nombre: <br><input name="display_name" type="text"/></p>
-            <input hidden name="mulema_user_role" value="Embajador"/>
-            <br><br><button class="mul-botonCobrar" type="submit">Agregar</button>
-            <br><br>
-    </form>
-</div> -->
-       
-        <div id="mulema-datos" class="justificar">
-            <h2> Mis datos  </h2> 
-            <hr/>
-            <h4>Datos bancarios</h4>
-            <p>Cuenta bancaria: <input type="text" value="<?php
-            $clabe_mul = get_user_meta( get_current_user_id(), "Clabe", true );
-           
-            echo $clabe_mul; ?>"/></p>
-            <br><br>
-            <div class="centrar"><button class="mul-botonCobrar" type="submit">Enviar</button></div>
-            <hr/>
-            <h4>Información de mi red</h4>
-            <p> Nominado por: <?php
-            $nominador_mul = get_user_meta( get_current_user_id(), "Nominador", true );
-            $nominador_mul_texto = get_user_by('id',$nominador_mul);
-            echo $nominador_mul_texto; ?></p><br>
-            <p> Registro en la plataforma: <?php
-            $nominador_mul = get_user_meta( get_current_user_id(), "Ingreso", true );
-            $nominador_mul_texto = get_user_by('id',$nominador_mul);
-            echo $nominador_mul_texto; ?></p>
-            <p><?php var_dump( get_user_meta( get_current_user_id(), "Foto", true ));  ?></p>
-            <br><br>
-        </div>
-<script>
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['Enero', 'Febrero','Marzo','Abril','Mayo','Junio'],
-        datasets: [{
-            label: 'Ventas (mdp)',
-            data: [4, 5, 2, 3, 9, 5],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                '#208171',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 10
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-
-//-----------------------------------
-
-var ctx2 = document.getElementById('myChart2').getContext('2d');
- 
-const data = {
-  labels: [
-    'Coyoacán',
-    'Milpa alta',
-    'Polanco',
-    'Reforma',
-    'Afganistán',
-  ],
-  datasets: [{
-    label: 'Regiones',
-    data: [3, 1, 4, 5, 4],
-    backgroundColor: [
-      'rgb(255, 99, 132)',
-      'rgb(75, 192, 192)',
-      'rgb(255, 205, 86)',
-      'rgb(201, 203, 207)',
-      'rgb(54, 162, 235)'
-    ]
-  }]
-};
-   const config = {
-  
-};
-var myChart2 = new Chart(ctx2, {
-type: 'polarArea',
-  data: data,
-  options: {resizable: false}
-});
-
-</script>
-</div>
- </div>
-<?php
+include('paginaLider.php');
 }
 
 
@@ -382,263 +163,16 @@ function mulema_embajada_panel(){
      echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
  $ventasUsr = "$137,000";
  $gananciasUsr = "$13,700";
-    ?>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<style>
-<?php
-include('other.php');
-
-?>
-</style>
-<div id="mulema-caratula">
-     <script>
-$('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });   
-         </scipt>
-    <div id="mulema-carSup">
-        <h2 id='mulemaHola'>Hola, Embajador(a)</h2>
-        <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
-        <div id="fotoPerfilContainer">
-     
-             
-         <img id="fotoPerfil" src ="https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png"  onclick="$('#imgupload').trigger('click'); return false;"/> 
-        
-        <div class="wrapper" hidden> 
-        
-        
-        <form method="post">
-     <input type="file" id="imgupload" onchange="$('#mandarFoto').trigger('click');" name="mulema_photo_change" hidden>
-        <input type="submit" id="mandarFoto" hidden/>
-    </form>
-</div>
-        </div>
-        <div id="mulCarSup3">
-            <div class="mulLeftHalf">
-            <div class="mulermaResaltarCentrar"><?php echo $ventasUsr; ?></div>
-            <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
-            </div>
-            <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo $gananciasUsr; ?></div>
-              <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
-            </div>
-        </div>
-    </div>
-    <div id="mulema-carInf">
-        <div id="mul-botonCobrarCont"><button id="mul-botonCobrar"><a>COBRAR</a></button></div>
-        <div id="mulema-mitadPortada">
-            <p class="mulema-cargo">EMBAJADORA LATAM</p>
-            <p class="mulema-username">Embajadora Deprueba</p>
-            <p  class="mulema-cargo"><i class="bi bi-telephone-fill"></i> 5572667744</p>
-            <div class="triplesCont">
-                <div class="triples">
-                    <p class="triplgrande">12</p>
-                    <p class="triplchico">PEDIDOS</p>
-                </div>
-                <div class="triples">
-                    <p class="triplgrande">34</p>
-                    <p class="triplchico">VENTAS</p>
-                </div>
-                <div class="triples">
-                    <p class="triplgrande">56</p>
-                    <p class="triplchico">PRODUCTOS</p>
-                </div>
-                 <span class="stretch"></span>
-            </div>
-        </div>
-        <div class="centrar" id="mulemaListas">
-            <table class="styled-table">
-    <thead>
-        <tr>
-            <th class="centrar" colspan="3">Clientes TOP</th>
-            
-        </tr>
-        <tr>
-            <th>Nombre</th>
-            <th>Compras</th>
-            <th>Comisión</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Cliente1</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Cliente2</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Cliente3</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Cliente4</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Cliente5</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Cliente6</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Cliente7</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-    </tbody>
-</table>
-
-        <table class="styled-table">
-    <thead>
-        <tr>
-            <th class="centrar" colspan="3">Categorías TOP</th>
-            
-        </tr>
-        <tr>
-            <th>Nombre</th>
-            <th>Ventas</th>
-            <th>Ganancia</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Collares</td>
-            <td>3000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Bolsos</td>
-            <td>5000</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Rifles de asalto</td>
-            <td>14000</td>
-            <td>900</td>
-        </tr>
-        <tr class="active-row">
-            <td>Ametralladoras</td>
-            <td>5000</td>
-            <td>515</td>
-        </tr>
-       
-    </tbody>
-</table>           
-            
-        </div>
-<div id="mulema-graficas">
-<div height="100px">
-<canvas id="myChart" style="height:40vh; width:80vw"></canvas>
-</div>
-<h2>Categorías</h2>
-<div style="position: relative; height:300px; width:300px; display: inline"  height="300px">
-    <canvas height="200px" width="200px" id="myChart2" style="height:300px; width:300px;display: inline-block;"></canvas>
-</div>
-</div>
-<div id="mulema-agregar" class="centrar">
-    <form method="post">
-            <h2>Agregar cliente</h2> 
-            <p> Login: <br><input name="mulema_user_to_add" type="text"/></p>
-            <p>Contraseña: <br><input name='mulema_user_pass' type="text"/></p>
-            <p>Email: <br><input name="mulema_user_mail" type="text"/></p>
-            <p>Nombre: <br><input name="display_name" type="text"/></p>
-            <input hidden name="mulema_user_role" value="Cliente"/>
-            <br><br><button class="mul-botonCobrar" type="submit">Agregar</button>
-            <br><br>
-    </form>
-</div> 
-        
-        
-        <div id="mulema-datos" class="centrar">
-            <h2> Mis datos bancarios  </h2> 
-            Cuenta: <input type="text" value="121212121212"/>
-            <br><br><button class="mul-botonCobrar" type="submit">Enviar</button>
-            <br><br>
-        </div>
-<script>
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['Enero', 'Febrero','Marzo','Abril','Mayo','Junio'],
-        datasets: [{
-            label: 'Ventas (mdp)',
-            data: [4, 5, 2, 3, 9, 5],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                '#208171',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 10
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-
-//-----------------------------------
-
-var ctx2 = document.getElementById('myChart2').getContext('2d');
- 
-const data = {
-  labels: [
-    'Bolsos',
-    'Joyería',
-    'Submarinos checoslovacos',
-    'Minas antitanque',
-    'Otros',
-  ],
-  datasets: [{
-    label: 'Categorías',
-    data: [3, 1, 4, 5, 4],
-    backgroundColor: [
-      'rgb(255, 99, 132)',
-      'rgb(75, 192, 192)',
-      'rgb(255, 205, 86)',
-      'rgb(201, 203, 207)',
-      'rgb(54, 162, 235)'
-    ]
-  }]
-};
-   const config = {
-  
-};
-var myChart2 = new Chart(ctx2, {
-type: 'polarArea',
-  data: data,
-  options: {resizable: false}
-});
-
-</script>
-</div>
- </div>
-<?php
-
+    
+include('paginaEmbajador.php');
+}
+function mulema_superadmin_panel(){
+   $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
+     echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+ $ventasUsr = "$137,000";
+ $gananciasUsr = "$13,700";
+    
+include('paginaSuperadmin.php');
 }
  add_action( 'admin_menu', 'mulema_add_panels' );
  
@@ -664,8 +198,31 @@ type: 'polarArea',
  }
  register_activation_hook( __FILE__, 'mulema_activate' );
  
+ //escribir archivo csv de todo
  
+function escribir_csv(){ 
+ $list = array (
+    array('prueba', 'de', 'archivo', 'csv'),
+    array('prueba', 'de', 'archivo', 'csv'),
+   array('prueba', 'de', 'archivo', 'csv'),
+);
+$lista = get_users();
  
+$fp = fopen('MLM.csv', 'a+');
+
+foreach ($list as $fields) {
+    
+   fputcsv($fp, $fields);
+}
+
+fclose($fp);
+$file_url = "MLM.csv";
+header('Content-Type: text/octet-stream');
+header("Content-Transfer-Encoding: Binary"); 
+header("Content-disposition: attachment; filename=\"" . basename($file_url) . "\""); 
+readfile($file_url); 
+die();
+}
 /**
  * Deactivation hook.
  */

@@ -246,3 +246,15 @@ canvas{
 .justificar h1, h2, h3, h4, h5, p{
 text-align: center;
 }
+
+.bajarcsv{
+width: 100%;
+margin: auto;
+background: #208171;
+border-radius: 8px;
+padding: 5px;
+color: white;
+font-weight: bold;
+text-align: center;
+border:none;
+}
