@@ -3,7 +3,9 @@
 <style>
    <?php
 include('other.php');
-
+$vtasHoy=0;
+$vtasMes = 0;
+$vtasAnio = 0;
 ?>
 </style>
 <div id="mulema-caratula">
@@ -11,7 +13,80 @@ include('other.php');
         <h2 id='mulemaHola'>Hola,   <?php
 $current_user = wp_get_current_user();
 echo $current_user->user_firstname;
-
+        $args = array(
+    'meta_query' => array(
+        array(
+             'key' => 'Lider',
+            'value' => get_current_user_id(),
+            'compare' => '='
+        )
+    )
+);
+        
+        /* 'key' => 'Lider',
+            'value' => get_current_user_id(),
+            'compare' => '='
+         * 
+         */
+$member_arr = get_users($args);
+if ($member_arr) {
+    $clase = 'class="active-row"';
+  foreach ($member_arr as $user) {
+    $usuario =  get_user_by('id',$user->ID);
+    $aidi = $user->ID;
+    
+   if(null !== $usuario->first_name && "" !== $usuario->first_name){
+    
+  
+     
+include_once("conn.php");
+$sql = "SELECT * FROM `wp_wc_customer_lookup` where user_id=".$aidi.";";
+//echo "<br>".$sql."<br>";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+      
+     $sql2="SELECT `total_sales`, `date_created`  FROM `wp_wc_order_stats` WHERE `customer_id`=".$row["customer_id"].";";
+   //$sql2="SELECT SUM(`total_sales`) AS `total_sales_sum` FROM `wp_wc_order_stats` WHERE `customer_id`=".$row["customer_id"].";";
+       
+   // echo "user_id: " . $row["user_id"]. "<br>";
+   // echo "customer_id: " . $row["customer_id"]. "<br><br>";
+   // echo "<br>---".$sql2."<br>";
+    $result2 = $conn->query($sql2);
+if($result2){
+    if ($result2->num_rows > 0) {
+  // output data of each row
+  while($row2 = $result2->fetch_assoc()) {
+//echo"Vtas tot: ".$row2["total_sales_sum"];
+$ventasUsr+=$row2["total_sales"];    
+    $origin = new DateTime($row2["date_created"]);
+$target = new DateTime("now");
+$interval =date_diff($origin, $target);
+if((intval($interval->format("%a")))<365){
+   $vtasAnio +=$row2["total_sales"]; 
+   if((intval($interval->format("%a")))<30){
+   $vtasMes +=$row2["total_sales"]; 
+   if((intval($interval->format("%a")))<1){
+   $vtasHoy +=$row2["total_sales"]; 
+   
+   }
+   }
+}
+  }
+}
+}
+    
+  }
+}
+   }else {
+  echo $result."  0 results<br><br>";
+}
+ }
+  }
+}
+$conn->close();
 ?></h2>
         <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
         <div id="fotoPerfilContainer">
@@ -25,11 +100,11 @@ echo $current_user->user_firstname;
         </div>
         <div id="mulCarSup3">
             <div class="mulLeftHalf">
-            <div class="mulermaResaltarCentrar"><?php echo $ventasUsr; ?></div>
+            <div class="mulermaResaltarCentrar"><?php echo  formatoMoneda($ventasUsr); ?></div>
             <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
             </div>
             <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo $gananciasUsr; ?></div>
+              <div class="mulermaResaltarCentrar"><?php echo formatoMoneda($gananciasUsr,true); ?></div>
               <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
             </div>
         </div>
@@ -51,16 +126,16 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
             <p  class="mulema-cargo"><i class="bi bi-telephone-fill"></i> 5572667744</p>
             <div class="triplesCont">
                 <div class="triples">
-                    <p class="triplgrande">12</p>
-                    <p class="triplchico">PEDIDOS</p>
+                    <p class="triplgrande"><?php echo formatoMoneda($vtasHoy);?></p>
+                    <p class="triplchico">DÍA</p>
                 </div>
                 <div class="triples">
-                    <p class="triplgrande">34</p>
-                    <p class="triplchico">VENTAS</p>
+                    <p class="triplgrande"><?php echo formatoMoneda($vtasMes);?></p>
+                    <p class="triplchico">MTD</p>
                 </div>
                 <div class="triples">
-                    <p class="triplgrande">56</p>
-                    <p class="triplchico">PRODUCTOS</p>
+                    <p class="triplgrande"><?php echo formatoMoneda($vtasAnio);?></p>
+                    <p class="triplchico">YTD</p>
                 </div>
                  <span class="stretch"></span>
             </div>
@@ -79,41 +154,53 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td>Embajador1</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador2</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Embajador3</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador4</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Embajador5</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador6</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Embajador7</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
+  <?php
+        
+        $args = array(
+    'meta_query' => array(
+        array(
+            'key' => 'Nominador',
+            'value' => get_current_user_id(),
+            'compare' => '='
+        ),
+         array(
+            'key' => 'Cargo',
+            'value' => "EMBAJADOR(A) REGIONAL",
+            'compare' => '='
+        )
+    )
+);
+$member_arr = get_users($args);
+if ($member_arr) {
+    $clase = 'class="active-row"';
+  foreach ($member_arr as $user) {
+    $usuario =  get_user_by('id',$user->ID);
+    $aidi = $user->ID;
+    if(null === (get_user_meta($aidi,"IngresoMeta", true))){
+       update_user_meta($aidi,"IngresoMeta",time());
+   }
+   if(null !== $usuario->first_name && "" !== $usuario->first_name){
+      echo '<tr '.$clase.'>';
+          echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
+          echo '<td>E/D</td>';
+          echo '<td>E/D</td>';
+        echo    '</tr>';
+           if($clase == 'class="active-row"'){
+       $clase = "";
+   }else if($clase == ""){
+    $clase = 'class="active-row"';   
+   }
+   }
+  
+  }
+} else {
+  echo '<tr class="active-row">
+            <td colspan="3">No se han encontrado usuarios</td>
+        </tr>';
+}
+        
+        
+        ?>
         <tr>
             <td colspan="3"><form method="post">
                     <input type="text" name="generarceseve" value="ok"   hidden>
@@ -140,26 +227,63 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td>Embajador11</td>
-            <td>3 días</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador12</td>
-            <td>5 días</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Embajador13</td>
-            <td>14 días</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Embajador4</td>
-            <td>51 días</td>
-            <td>51500</td>
-        </tr>
+      <?php
+        
+        $args = array(
+    'meta_query' => array(
+        array(
+            'key' => 'Nominador',
+            'value' => get_current_user_id(),
+            'compare' => '='
+        ),
+         array(
+            'key' => 'Cargo',
+            'value' => "EMBAJADOR(A) REGIONAL",
+            'compare' => '='
+        )
+    )
+);
+$member_arr = get_users($args);
+if ($member_arr) {
+    $clase = 'class="active-row"';
+  foreach ($member_arr as $user) {
+    $usuario =  get_user_by('id',$user->ID);
+    $aidi = $user->ID;
+    if(null === (get_user_meta($aidi,"IngresoMeta", true))){
+       update_user_meta($aidi,"IngresoMeta",time());
+   }
+   if(null !== $usuario->first_name && "" !== $usuario->first_name){
+      echo '<tr '.$clase.'>';
+          echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
+          if(((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/36000)<1){
+            echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/60).' minutos</td>';  
+          }
+          else if(round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600)<48
+                  && ((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600)>1){
+          echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600).' horas</td>';
+          }else{
+          echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600000*24)).' días</td>';   
+          }
+          echo '<td>E/D</td>';
+        echo    '</tr>';
+         if($clase == 'class="active-row"'){
+       $clase = "";
+   }else if($clase == ""){
+    $clase = 'class="active-row"';   
+   }
+   }
+   
+  }
+} else {
+  echo '<tr class="active-row">
+            <td colspan="3">No se han encontrado usuarios</td>
+        </tr>';
+}
+        
+        
+        ?>
+        
+
        <tr>
             <td colspan="3"><form method="post">
                     <input type="text" name="generarceseve" value="ok"   hidden>
@@ -213,16 +337,50 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
     </form>
 </div>
        
-        <div id="mulema-datos" class="justificar">
+               <div id="mulema-datos" class="centrar">
             <h2> Mis datos  </h2> 
             <hr/>
-            <h4>Datos bancarios</h4>
-            <p>Cuenta bancaria: <input type="text" value="<?php
+            <h4>Cuenta bancaria:</h4>
+            <p><form method="post"> <input type="text" name="mulema_update_clabe" value="<?php
             $clabe_mul = get_user_meta( get_current_user_id(), "Clabe", true );
-           
-            echo $clabe_mul; ?>"/></p>
-            <br><br>
-            <div class="centrar"><button class="mul-botonCobrar" type="submit">Enviar</button></div>
+            echo $clabe_mul; ?>"/></p> 
+            <div class="centrar"><button class="mul-botonCobrar" type="submit">Cambiar</button></div>
+            </form><form method="post">
+            <h4>Código postal:</h4>
+            <p> <input type="text" name="mulema_update_cp"  value="<?php
+            $cp_mul = get_user_meta( get_current_user_id(), "CP", true );
+            echo $cp_mul; ?>"/></p>
+             <div class="centrar"><button class="mul-botonCobrar" type="submit">Cambiar</button></div>
+             </form>
+            <form method="post">
+            <h4>Calle y número:</h4>
+            <p> <input type="text" name="mulema_update_addr"  value="<?php
+            $addr_mul = get_user_meta( get_current_user_id(), "Addr", true );
+            echo $addr_mul; ?>"/></p>
+             <div class="centrar"><button class="mul-botonCobrar" type="submit">Cambiar</button></div>
+             </form>
+            <form method="post">
+            <h4>Ciudad:</h4>
+            <p> <input type="text" name="mulema_update_city"  value="<?php
+            $cit_mul = get_user_meta( get_current_user_id(), "City", true );
+            echo $cit_mul; ?>"/></p>
+             <div class="centrar"><button class="mul-botonCobrar" type="submit">Cambiar</button></div>
+             </form>
+            <form method="post">
+            <h4>Estado:</h4>
+            <p> <select name="mulema_update_region"  value="<?php
+            $reg_mul = get_user_meta( get_current_user_id(), "Region", true );
+            echo $reg_mul; ?>">
+    <option value="CDMX" <?php if($reg_mul == "CDMX"){ echo "selected='selected'"; }?>>CDMX</option>
+    <option value="MEX" <?php if($reg_mul == "MEX"){ echo "selected='selected'"; }?>>Estado de México</option>
+    <option value="MICH" <?php if($reg_mul == "MICH"){ echo "selected='selected'"; }?>>Michoacán</option>
+    <option value="VER" <?php if($reg_mul == "VER"){ echo "selected='selected'"; }?>>Veracruz</option>
+  </select>
+            
+            
+            </p>
+             <div class="centrar"><button class="mul-botonCobrar" type="submit">Cambiar</button></div>
+             </form>
             <hr/>
             <h4>Información de mi red</h4>
             <p> Nominado por: <?php

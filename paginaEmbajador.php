@@ -3,7 +3,9 @@
 <style>
 <?php
 include('other.php');
-
+$vtasHoy=0;
+$vtasMes = 0;
+$vtasAnio = 0;
 ?>
 </style>
 <div id="mulema-caratula">
@@ -14,7 +16,80 @@ $('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });
        <h2 id='mulemaHola'>Hola,   <?php
 $current_user = wp_get_current_user();
 echo $current_user->user_firstname;
-
+       $args = array(
+    'meta_query' => array(
+        array(
+            'key' => 'Embajador',
+            'value' => get_current_user_id(),
+            'compare' => '='
+        )
+    )
+);
+        
+        /* 'key' => 'Lider',
+            'value' => get_current_user_id(),
+            'compare' => '='
+         * 
+         */
+$member_arr = get_users($args);
+if ($member_arr) {
+    $clase = 'class="active-row"';
+  foreach ($member_arr as $user) {
+    $usuario =  get_user_by('id',$user->ID);
+    $aidi = $user->ID;
+    
+   if(null !== $usuario->first_name && "" !== $usuario->first_name){
+    
+  
+     
+include_once("conn.php");
+$sql = "SELECT * FROM `wp_wc_customer_lookup` where user_id=".$aidi.";";
+//echo "<br>".$sql."<br>";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+      
+     $sql2="SELECT `total_sales`, `date_created`  FROM `wp_wc_order_stats` WHERE `customer_id`=".$row["customer_id"].";";
+   //$sql2="SELECT SUM(`total_sales`) AS `total_sales_sum` FROM `wp_wc_order_stats` WHERE `customer_id`=".$row["customer_id"].";";
+       
+   // echo "user_id: " . $row["user_id"]. "<br>";
+   // echo "customer_id: " . $row["customer_id"]. "<br><br>";
+   // echo "<br>---".$sql2."<br>";
+    $result2 = $conn->query($sql2);
+if($result2){
+    if ($result2->num_rows > 0) {
+  // output data of each row
+  while($row2 = $result2->fetch_assoc()) {
+//echo"Vtas tot: ".$row2["total_sales_sum"];
+$ventasUsr+=$row2["total_sales"];    
+    $origin = new DateTime($row2["date_created"]);
+$target = new DateTime("now");
+$interval =date_diff($origin, $target);
+if((intval($interval->format("%a")))<365){
+   $vtasAnio +=$row2["total_sales"]; 
+   if((intval($interval->format("%a")))<30){
+   $vtasMes +=$row2["total_sales"]; 
+   if((intval($interval->format("%a")))<1){
+   $vtasHoy +=$row2["total_sales"]; 
+   
+   }
+   }
+}
+  }
+}
+}
+    
+  }
+}
+   }else {
+  echo $result."  0 results<br><br>";
+}
+ }
+  }
+}
+$conn->close();
 ?></h2>
         <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
         <div id="fotoPerfilContainer">
@@ -33,11 +108,11 @@ echo $current_user->user_firstname;
         </div>
         <div id="mulCarSup3">
             <div class="mulLeftHalf">
-            <div class="mulermaResaltarCentrar"><?php echo $ventasUsr; ?></div>
+            <div class="mulermaResaltarCentrar"><?php echo  formatoMoneda($ventasUsr); ?></div>
             <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
             </div>
             <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo $gananciasUsr; ?></div>
+              <div class="mulermaResaltarCentrar"><?php echo formatoMoneda($gananciasUsr,true); ?></div>
               <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
             </div>
         </div>
@@ -48,22 +123,22 @@ echo $current_user->user_firstname;
             <p class="mulema-cargo"><?php echo get_user_meta( get_current_user_id(), "Cargo", true ); ?></p>
             <p class="mulema-username"><?php
 $current_user = wp_get_current_user();
-echo $current_user->user_firstname." ".$current_user->user_lastname;
-
+echo $current_user->user_firstname;
+ 
 ?></p>
             <p  class="mulema-cargo"><i class="bi bi-telephone-fill"></i> 5572667744</p>
-            <div class="triplesCont">
+             <div class="triplesCont">
                 <div class="triples">
-                    <p class="triplgrande">12</p>
-                    <p class="triplchico">PEDIDOS</p>
+                    <p class="triplgrande"><?php echo formatoMoneda($vtasHoy);?></p>
+                    <p class="triplchico">DÍA</p>
                 </div>
                 <div class="triples">
-                    <p class="triplgrande">34</p>
-                    <p class="triplchico">VENTAS</p>
+                    <p class="triplgrande"><?php echo formatoMoneda($vtasMes);?></p>
+                    <p class="triplchico">MTD</p>
                 </div>
                 <div class="triples">
-                    <p class="triplgrande">56</p>
-                    <p class="triplchico">PRODUCTOS</p>
+                    <p class="triplgrande"><?php echo formatoMoneda($vtasAnio);?></p>
+                    <p class="triplchico">YTD</p>
                 </div>
                  <span class="stretch"></span>
             </div>
@@ -82,41 +157,53 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td>Cliente1</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Cliente2</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Cliente3</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Cliente4</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Cliente5</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
-        <tr class="active-row">
-            <td>Cliente6</td>
-            <td>5150</td>
-            <td>515</td>
-        </tr>
-        <tr>
-            <td>Cliente7</td>
-            <td>6000</td>
-            <td>600</td>
-        </tr>
+         <?php
+        
+        $args = array(
+    'meta_query' => array(
+        array(
+            'key' => 'Nominador',
+            'value' => get_current_user_id(),
+            'compare' => '='
+        ),
+         array(
+            'key' => 'Cargo',
+            'value' => "USUARIO VIP",
+            'compare' => '='
+        )
+    )
+);
+$member_arr = get_users($args);
+if ($member_arr) {
+    $clase = 'class="active-row"';
+  foreach ($member_arr as $user) {
+    $usuario =  get_user_by('id',$user->ID);
+    $aidi = $user->ID;
+    if(null === (get_user_meta($aidi,"IngresoMeta", true))){
+       update_user_meta($aidi,"IngresoMeta",time());
+   }
+   if(null !== $usuario->first_name && "" !== $usuario->first_name){
+      echo '<tr '.$clase.'>';
+          echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
+          echo '<td>E/D</td>';
+          echo '<td>E/D</td>';
+        echo    '</tr>';
+         if($clase == 'class="active-row"'){
+       $clase = "";
+   }else if($clase == ""){
+    $clase = 'class="active-row"';   
+   }
+   }
+   
+  }
+} else {
+  echo '<tr class="active-row">
+            <td colspan="3">No se han encontrado usuarios</td>
+        </tr>';
+}
+        
+        
+        ?>
         <tr>
             <td colspan="3"><form method="post">
                     <input type="text" name="generarceseve" value="ok"   hidden>
@@ -145,23 +232,23 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
     <tbody>
         <tr>
             <td>Collares</td>
-            <td>3000</td>
-            <td>600</td>
+            <td>E/D</td>
+            <td>E/D</td>
         </tr>
         <tr class="active-row">
             <td>Bolsos</td>
-            <td>5000</td>
-            <td>515</td>
+            <td>E/D</td>
+            <td>E/D</td>
         </tr>
         <tr>
             <td>Rifles de asalto</td>
-            <td>14000</td>
-            <td>900</td>
+            <td>E/D</td>
+            <td>E/D</td>
         </tr>
         <tr class="active-row">
             <td>Ametralladoras</td>
-            <td>5000</td>
-            <td>515</td>
+            <td>E/D</td>
+            <td>E/D</td>
         </tr>
        <tr>
             <td colspan="3"><form method="post">
@@ -235,10 +322,10 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
             <p> <select name="mulema_update_region"  value="<?php
             $reg_mul = get_user_meta( get_current_user_id(), "Region", true );
             echo $reg_mul; ?>">
-    <option value="Norte" <?php if($reg_mul == "Norte"){ echo "selected='selected'"; }?>>Norte</option>
-    <option value="Bajío" <?php if($reg_mul == "Bajío"){ echo "selected='selected'"; }?>>Bajío</option>
-    <option value="Centro" <?php if($reg_mul == "Centro"){ echo "selected='selected'"; }?>>Centro</option>
-    <option value="Sur" <?php if($reg_mul == "Sur"){ echo "selected='selected'"; }?>>Sur</option>
+    <option value="CDMX" <?php if($reg_mul == "CDMX"){ echo "selected='selected'"; }?>>CDMX</option>
+    <option value="MEX" <?php if($reg_mul == "MEX"){ echo "selected='selected'"; }?>>Estado de México</option>
+    <option value="MICH" <?php if($reg_mul == "MICH"){ echo "selected='selected'"; }?>>Michoacán</option>
+    <option value="VER" <?php if($reg_mul == "VER"){ echo "selected='selected'"; }?>>Veracruz</option>
   </select>
             
             

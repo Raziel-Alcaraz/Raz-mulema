@@ -58,12 +58,17 @@ function process_post() {
         echo "Agregado un usuario con ID: ". $userId;
          update_user_meta( $userId, "Nominador", get_current_user_id());
          update_user_meta( $userId, "Ingreso", date("l jS \de F \de Y h:i:s A", time()));
+         update_user_meta( $userId, "IngresoMeta", time());
          update_user_meta( $userId, "Foto", "https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png");
          
        if($_POST['mulema_user_role'] == "Embajador"){
           update_user_meta( $userId, "Cargo", "EMBAJADOR(A) REGIONAL");
           update_user_meta( $userId, "Lider", get_current_user_id());
        }  
+       else if($_POST['mulema_user_role'] == "Lider"){
+          update_user_meta( $userId, "Cargo", "GERENTE REGIONAL");
+          update_user_meta( $userId, "Lider", get_current_user_id());
+       } 
        else if($_POST['mulema_user_role'] == "Cliente"){
           update_user_meta( $userId, "Cargo", "USUARIO VIP");
           update_user_meta( $userId, "Lider", get_user_meta(get_current_user_id(),"Nominador", true));
@@ -107,7 +112,7 @@ function process_post() {
      }
      else if ( isset( $_POST['generarceseve'] ) ){
         // echo "escribiendo csv";
-         escribir_csv();
+         escribir_csv($_POST['generarceseve']);
      }
      else{
     //echo "------------nada-------";
@@ -152,8 +157,8 @@ function process_post() {
  function mulema_lider_panel(){
 $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
      echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
- $ventasUsr = "$137,000";
- $gananciasUsr = "$13,700";
+ $ventasUsr = 0;
+ $gananciasUsr = 0;
 include('paginaLider.php');
 }
 
@@ -161,16 +166,16 @@ include('paginaLider.php');
 function mulema_embajada_panel(){
    $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
      echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
- $ventasUsr = "$137,000";
- $gananciasUsr = "$13,700";
+ $ventasUsr = 0;
+ $gananciasUsr = 0;
     
 include('paginaEmbajador.php');
 }
 function mulema_superadmin_panel(){
    $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
      echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
- $ventasUsr = "$137,000";
- $gananciasUsr = "$13,700";
+ $ventasUsr = 0;
+ $gananciasUsr = 0;
     
 include('paginaSuperadmin.php');
 }
@@ -200,27 +205,120 @@ include('paginaSuperadmin.php');
  
  //escribir archivo csv de todo
  
-function escribir_csv(){ 
+function escribir_csv($kualPrro){ 
+
+if($kualPrro == "nvasInc"){
+            $args = array(
+    'meta_query' => array(
+        array(
+            'key' => 'Nominador',
+            'value' => get_current_user_id(),
+            'compare' => '='
+        )
+    )
+);
+$member_arr = get_users($args);
  $list = array (
+              array('SalesEmployeeCode', 'SalesEmployeeName', 'Remarks'));
+if ($member_arr) {
+    $clase = 'class="active-row"';
+    
+  foreach ($member_arr as $user) {
+    $usuario =  get_user_by('id',$user->ID);
+    $aidi = $user->ID;
+    $aidi2 = strval($aidi);
+    
+    if(strlen($aidi2)>3){
+        $aidi2 = "0".$aidi2;
+    }
+    if(strlen($aidi2)>3){
+        $aidi2 = "0".$aidi2;
+    }
+    if(null === (get_user_meta($aidi,"IngresoMeta", true))){
+       update_user_meta($aidi,"IngresoMeta",time());
+   }
+   if(null !== $usuario->first_name && "" !== $usuario->first_name){
+        
+             
+   
+        $linea=  array($aidi2,$usuario->first_name . ' ' . $usuario->last_name,  'Ingreso: '.get_user_meta($aidi,"Ingreso", true));
+        array_push($list,$linea); 
+   }
+
+  }
+} else {
+
+}
+    
+}
+
+if($kualPrro == "nvasInc"){
+            $args = array(
+    'meta_query' => array(
+        array(
+            'key' => 'Nominador',
+            'value' => get_current_user_id(),
+            'compare' => '='
+        )
+    )
+);
+$member_arr = get_users($args);
+ $list = array (
+              array('SalesEmployeeCode', 'SalesEmployeeName', 'Remarks'));
+if ($member_arr) {
+    $clase = 'class="active-row"';
+    
+  foreach ($member_arr as $user) {
+    $usuario =  get_user_by('id',$user->ID);
+    $aidi = $user->ID;
+    $aidi2 = strval($aidi);
+    
+    if(strlen($aidi2)>3){
+        $aidi2 = "0".$aidi2;
+    }
+    if(strlen($aidi2)>3){
+        $aidi2 = "0".$aidi2;
+    }
+    if(null === (get_user_meta($aidi,"IngresoMeta", true))){
+       update_user_meta($aidi,"IngresoMeta",time());
+   }
+   if(null !== $usuario->first_name && "" !== $usuario->first_name){
+        
+             
+   
+        $linea=  array($aidi2,$usuario->first_name . ' ' . $usuario->last_name,  'Ingreso: '.get_user_meta($aidi,"Ingreso", true));
+        array_push($list,$linea); 
+   }
+
+  }
+} else {
+
+}
+    
+}
+else{
+     $list = array (
     array('prueba', 'de', 'archivo', 'csv'),
     array('prueba', 'de', 'archivo', 'csv'),
    array('prueba', 'de', 'archivo', 'csv'),
 );
 $lista = get_users();
  
-$fp = fopen('MLM.csv', 'a+');
+
+}
+$fp = fopen('MLM2.csv', 'w');
 
 foreach ($list as $fields) {
     
    fputcsv($fp, $fields);
 }
-
 fclose($fp);
-$file_url = "MLM.csv";
+$file_url = "MLM2.csv";
 header('Content-Type: text/octet-stream');
-header("Content-Transfer-Encoding: Binary"); 
+header("Content-Transfer-Encoding: Csv"); 
 header("Content-disposition: attachment; filename=\"" . basename($file_url) . "\""); 
 readfile($file_url); 
+
 die();
 }
 /**
