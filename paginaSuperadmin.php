@@ -2,10 +2,11 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <style>
 <?php
-include('other.php');
+include_once('other.php');
 $vtasHoy=0;
 $vtasMes = 0;
 $vtasAnio = 0;
+include_once("formatoMoneda.php");
 ?>
 </style>
 <div id="mulema-caratula">
@@ -42,7 +43,7 @@ if ($member_arr) {
     
   
      
-include_once("conn.php");
+include("conn.php");
 $sql = "SELECT * FROM `wp_wc_customer_lookup` where user_id=".$aidi.";";
 //echo "<br>".$sql."<br>";
 $result = $conn->query($sql);
@@ -118,7 +119,11 @@ $conn->close();
         </div>
     </div>
     <div id="mulema-carInf">
-        <div id="mul-botonCobrarCont"><button id="mul-botonCobrar"><a>COBRAR</a></button></div>
+        <div id="mul-botonCobrarCont"> 
+            <form method="post">
+                <input type="text" name="actualizarDatabase"  value="act"   hidden>
+                <button type="submit" id="mul-botonCobrar"><a>ACTUALIZAR TODO</a></button>
+            </form></div>
         <div id="mulema-mitadPortada">
             <p class="mulema-cargo"><?php echo get_user_meta( get_current_user_id(), "Cargo", true ); ?></p>
             <p class="mulema-username"><?php
@@ -152,7 +157,7 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
         </tr>
         <tr>
             <th>Nombre</th>
-            <th>Compras</th>
+            <th>Ventas</th>
             <th>Comisión</th>
         </tr>
     </thead>
@@ -185,6 +190,36 @@ if ($member_arr) {
    if(null !== $usuario->first_name && "" !== $usuario->first_name){
       echo '<tr '.$clase.'>';
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
+//----------consulta a db inicio------------------------------------------------------------------------------
+            
+     /*
+include_once("conn.php");
+$sql = "SELECT * FROM `wp_wc_customer_lookup` where user_id=".$aidi.";";
+//echo "<br>".$sql."<br>";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+    $ventasLid=0;
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+      
+      
+      
+  }
+  }
+  }
+      * 
+      * 
+      */
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+          
+          
+          
+          
+          
+          
+          
+          
           echo '<td>E/D</td>';
           echo '<td>E/D</td>';
         echo    '</tr>';
@@ -259,7 +294,7 @@ if ($member_arr) {
                   && ((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600)>1){
           echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600).' horas</td>';
           }else{
-          echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600000*24)).' días</td>';   
+          echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600*24)).' días</td>';   
           }
           echo '<td>'.get_user_meta($aidi,"Cargo", true).'</td>';
         echo    '</tr>';

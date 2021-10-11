@@ -14,26 +14,6 @@ if ($conn->connect_error) {
 }
 
 
-function formatMoney($number, $fractional=false) {
-    if ($fractional) {
-        $number = sprintf('%.2f', $number);
-    }
-    while (true) {
-        $replaced = preg_replace('/(-?\d+)(\d\d\d)/', '$1,$2', $number);
-        if ($replaced != $number) {
-            $number = $replaced;
-        } else {
-            break;
-        }
-    }
-    return $number;
-} 
-
-function formatoMoneda($cual, $frac=false){
-    setlocale(LC_MONETARY, 'es_MX');
-return "$". formatMoney( $cual, $frac);
-   // return $cual;
-}
 /* esquema de consulta, para que no se me pinches olvide
  * include_once("conn.php");
 $sql = "SELECT id, firstname, lastname FROM MyGuests";

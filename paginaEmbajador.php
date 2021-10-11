@@ -6,6 +6,7 @@ include('other.php');
 $vtasHoy=0;
 $vtasMes = 0;
 $vtasAnio = 0;
+include_once("formatoMoneda.php");
 ?>
 </style>
 <div id="mulema-caratula">

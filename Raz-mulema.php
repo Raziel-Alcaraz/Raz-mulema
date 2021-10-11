@@ -114,6 +114,11 @@ function process_post() {
         // echo "escribiendo csv";
          escribir_csv($_POST['generarceseve']);
      }
+     else if ( isset( $_POST['actualizarDatabase'] ) ){
+        // echo "escribiendo csv";
+         include_once("actualizarDB.php");
+         actualizarDB();
+     }
      else{
     //echo "------------nada-------";
      }
@@ -198,6 +203,15 @@ include('paginaSuperadmin.php');
      
      mulema_add_panels();
      // Clear the permalinks after the post type has been registered.
+     
+//consulta a DB inicio---------------------------------------------------------------------
+     
+ include_once("conn.php");    
+     
+     
+//consulta a DB fin---------------------------------------------------------------------
+     
+     
      flush_rewrite_rules();
      }
  }

@@ -6,6 +6,7 @@ include('other.php');
 $vtasHoy=0;
 $vtasMes = 0;
 $vtasAnio = 0;
+include_once("formatoMoneda.php");
 ?>
 </style>
 <div id="mulema-caratula">
@@ -262,7 +263,7 @@ if ($member_arr) {
                   && ((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600)>1){
           echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600).' horas</td>';
           }else{
-          echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600000*24)).' días</td>';   
+          echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600*24)).' días</td>';   
           }
           echo '<td>E/D</td>';
         echo    '</tr>';
