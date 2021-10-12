@@ -192,7 +192,19 @@ include('paginaSuperadmin.php');
       echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
  }
  add_action('wp_head', 'mulema_chartjs');
-
+ function my_login_logo() { ?>
+    <style type="text/css">
+        #login h1 a, .login h1 a {
+            background-image: url('https://viveelite.com/wp-content/uploads/2021/07/VE-2.png');
+		height:86px;
+		width:100px;
+		background-size: 100px 86px;
+		background-repeat: no-repeat;
+        	padding-bottom: 30px;
+        }
+    </style>
+<?php }
+add_action( 'login_enqueue_scripts', 'my_login_logo' );
  /**
   * Activate the plugin.
   */
@@ -215,6 +227,7 @@ include('paginaSuperadmin.php');
      flush_rewrite_rules();
      }
  }
+
  register_activation_hook( __FILE__, 'mulema_activate' );
  
  //escribir archivo csv de todo
