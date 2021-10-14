@@ -8,6 +8,7 @@
 
 
 function formatMoney($number, $fractional=false) {
+    $number = floatval($number);
     if ($fractional) {
         $number = sprintf('%.2f', $number);
     }
@@ -26,4 +27,18 @@ function formatoMoneda($cual, $frac=false){
     setlocale(LC_MONETARY, 'es_MX');
 return "$". formatMoney( $cual, $frac);
    // return $cual;
+}
+
+function comisiones($cuanto){
+  $cuanto = floatval($cuanto);
+  if($cuanto < 30000){
+      return formatoMoneda(0,true);
+  }else if($cuanto >= 30000 && $cuanto < 45000){
+      return formatoMoneda($cuanto*.15,true);
+  }
+  else if($cuanto >= 45000 && $cuanto < 60000){
+      return formatoMoneda($cuanto*.3,true);
+  }else if($cuanto >= 60000){
+      return formatoMoneda($cuanto*.6,true);
+  }
 }

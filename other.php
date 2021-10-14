@@ -3,7 +3,7 @@
     } 
 	#mulemaListas{
 		display: block;
-		margin-top: 400px;
+		//margin-top: 400px;
 	}
     #mulema-carSup{
         height: 50vh;
@@ -151,7 +151,7 @@
      }
      #mulema-mitadPortada{
          height: 50vh;
-         width: 400px;
+         width: 600px;
          max-width: 95vw;
          margin:auto;
          display: block;
@@ -165,7 +165,7 @@
         color: black;
      }
      .triplesCont{
-        width: 100%;
+        width: auto;
          margin: auto;
           text-align: justify;
   -ms-text-justify: distribute-all-lines;
@@ -176,12 +176,14 @@
     margin: auto;
     height: 12vh;
     min-height: 95px;
-    width: 25vw;
-    max-width: 120px;
+    width: auto;
+    min-width: 20%;
+    max-width: 31%;
     background: #208171;
     border-radius: 16px;
    /* border: 1px white solid; */
     padding: 0vw;
+    margin-bottom: 10px;
     color: white;
     font-weight: bold;
     text-align: center;
@@ -189,7 +191,7 @@
     }
     .triplgrande{
       font-weight: bold;
-        font-size: xx-large; 
+        font-size: x-large; 
         padding:0;
         margin: 0;
     }
@@ -204,28 +206,35 @@
     margin: 30px auto;
     font-size: large;
     font-family: sans-serif;
-    min-width: 400px;
+    min-width: 300px;
+    max-width: 95vw;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
 }
 .styled-table thead tr {
     background-color: #208171;
     color: #ffffff;
-    text-align: left;
+    text-align: center;
+    border-radius: 4px;
 }
 .styled-table th,
 .styled-table td {
-    padding: 12px 15px;
+    padding: 7px 5px;
+    border-radius: 4px;
 }
 .styled-table tbody tr {
     border-bottom: 1px solid #dddddd;
+    border-radius: 4px;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
     background-color: #f3f3f3;
+    border-radius: 4px;
 }
 
 .styled-table tbody tr:last-of-type {
     border-bottom: 2px solid #009879;
+    border-radius: 4px;
 }
 .styled-table tbody tr.active-row {
     font-weight: bold;

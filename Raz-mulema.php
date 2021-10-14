@@ -26,6 +26,10 @@
     return 'Cliente'; // This is changed
     return $default_role; // This allows default
 });
+$mul_id_lid = 1;
+$mul_id_emb = 1;
+
+
 function process_post() {
      if( isset( $_POST['mulema_user_to_add'] ) ) {
          if($_POST['mulema_user_role'] == "Lider"){
@@ -57,7 +61,7 @@ function process_post() {
        
         echo "Agregado un usuario con ID: ". $userId;
          update_user_meta( $userId, "Nominador", get_current_user_id());
-         update_user_meta( $userId, "Ingreso", date("l jS \de F \de Y h:i:s A", time()));
+         update_user_meta( $userId, "Ingreso", date("l jS \d\e F \d\e Y h:i:s A", time()));
          update_user_meta( $userId, "IngresoMeta", time());
          update_user_meta( $userId, "Foto", "https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png");
          
@@ -67,15 +71,15 @@ function process_post() {
        }  
        else if($_POST['mulema_user_role'] == "Lider"){
           update_user_meta( $userId, "Cargo", "GERENTE REGIONAL");
-          update_user_meta( $userId, "Lider", get_current_user_id());
+         // update_user_meta( $userId, "Lider", get_current_user_id());
        } 
        else if($_POST['mulema_user_role'] == "Cliente"){
           update_user_meta( $userId, "Cargo", "USUARIO VIP");
-          update_user_meta( $userId, "Lider", get_user_meta(get_current_user_id(),"Nominador", true));
+          update_user_meta( $userId, "Lider", get_user_meta(get_current_user_id(),"Lider", true));
           update_user_meta( $userId, "Embajador", get_current_user_id());
        } 
        //TODO: editar foto subida  
-         
+       
      }else if ( isset( $_POST['mulema_update_clabe'] ) ){
         echo "Datos cambiados: CLABE";
          update_user_meta( get_current_user_id(), "Clabe", $_POST['mulema_update_clabe']);

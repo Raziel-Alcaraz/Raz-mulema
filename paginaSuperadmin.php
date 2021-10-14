@@ -55,9 +55,9 @@ if ($result->num_rows > 0) {
      $sql2="SELECT `total_sales`, `date_created`  FROM `wp_wc_order_stats` WHERE `customer_id`=".$row["customer_id"].";";
    //$sql2="SELECT SUM(`total_sales`) AS `total_sales_sum` FROM `wp_wc_order_stats` WHERE `customer_id`=".$row["customer_id"].";";
        
-   // echo "user_id: " . $row["user_id"]. "<br>";
-   // echo "customer_id: " . $row["customer_id"]. "<br><br>";
-   // echo "<br>---".$sql2."<br>";
+   //echo "user_id: " . $row["user_id"]. "<br>";
+   //echo "customer_id: " . $row["customer_id"]. "<br><br>";
+   //echo "<br>---".$sql2."<br>";
     $result2 = $conn->query($sql2);
 if($result2){
     if ($result2->num_rows > 0) {
@@ -90,7 +90,7 @@ if((intval($interval->format("%a")))<365){
  }
   }
 }
-$conn->close();
+
 ?></h2>
         <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
         <div id="fotoPerfilContainer">
@@ -113,7 +113,7 @@ $conn->close();
             <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
             </div>
             <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo formatoMoneda($gananciasUsr,true); ?></div>
+              <div class="mulermaResaltarCentrar"><?php echo   comisiones($ventasUsr); ?></div>
               <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
             </div>
         </div>
@@ -149,28 +149,27 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
             </div>
         </div>
         <div class="centrar" id="mulemaListas">
+            
+           
+            
             <table class="styled-table">
     <thead>
         <tr>
             <th class="centrar" colspan="3">Líderes TOP</th>
             
         </tr>
-        <tr>
-            <th>Nombre</th>
-            <th>Ventas</th>
-            <th>Comisión</th>
+        <tr  class="centrar" >
+            <th onclick="sortTable(0,'mul-Lid')">Nombre</th>
+            <th onclick="sortTable(1,'mul-Lid')">Ventas</th>
+            <th onclick="sortTable(2,'mul-Lid')">Comisión</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody  id="mul-Lid">
     <?php
         
         $args = array(
     'meta_query' => array(
-        array(
-            'key' => 'Nominador',
-            'value' => get_current_user_id(),
-            'compare' => '='
-        ),
+        
          array(
             'key' => 'Cargo',
             'value' => "GERENTE REGIONAL",
@@ -180,7 +179,7 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
 );
 $member_arr = get_users($args);
 if ($member_arr) {
-    $clase = 'class="active-row"';
+    $clase = '';
   foreach ($member_arr as $user) {
     $usuario =  get_user_by('id',$user->ID);
     $aidi = $user->ID;
@@ -192,25 +191,28 @@ if ($member_arr) {
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
 //----------consulta a db inicio------------------------------------------------------------------------------
             
-     /*
+  
 include_once("conn.php");
-$sql = "SELECT * FROM `wp_wc_customer_lookup` where user_id=".$aidi.";";
+$sql = "SELECT SUM(`monto_compra`) FROM `wp_mul_hipercubo` where id_lider='".$aidi."';";
 //echo "<br>".$sql."<br>";
 $result = $conn->query($sql);
 if($result){
 if ($result->num_rows > 0) {
     $ventasLid=0;
+    
   // output data of each row
   while($row = $result->fetch_assoc()) {
-      
-      
+    echo "<td>";
+    echo(formatoMoneda($row['SUM(`monto_compra`)']));
+    echo"</td>";  
+     echo "<td>";
+     echo(comisiones($row['SUM(`monto_compra`)']));
+    echo"</td>";   
       
   }
   }
   }
-      * 
-      * 
-      */
+     
 //_-------------------consulta a db FIN------------------------------------------------------------------------------     
           
           
@@ -220,12 +222,11 @@ if ($result->num_rows > 0) {
           
           
           
-          echo '<td>E/D</td>';
-          echo '<td>E/D</td>';
+         
         echo    '</tr>';
    }
    if($clase == 'class="active-row"'){
-       $clase = "";
+     $clase = "";
    }else{
     $clase = 'class="active-row"';   
    }
@@ -250,34 +251,116 @@ if ($result->num_rows > 0) {
         </tr>
     </tbody>
 </table>
-
+ <script>
+function sortTable(n, aidi) {
+  var table = 0;
+  var   rows = 0;
+  var   switching = 0;
+  var   i = 0;
+ 
+  var   y = 0;
+  var   shouldSwitch = 0;
+  var   dir = 0;
+  var   switchcount = 0;
+  table = document.getElementById(aidi);
+  switching = true;
+  // Set the sorting direction to ascending:
+  dir = "asc";
+  /* Make a loop that will continue until
+  no switching has been done: */
+  while (switching) {
+    // Start by saying: no switching is done:
+    switching = false;
+    rows = table.rows;
+    /* Loop through all table rows (except the
+    first, which contains table headers): */
+    for (i = 0; i < (rows.length - 2); i++) {
+      // Start by saying there should be no switching:
+      shouldSwitch = false;
+      /* Get the two elements you want to compare,
+      one from current row and one from the next: */
+      var xt = rows[i].getElementsByTagName("TD")[n];
+      y = rows[i + 1].getElementsByTagName("TD")[n];
+      /* Check if the two rows should switch place,
+      based on the direction, asc or desc: */
+      if (dir == "asc") {
+        if (xt.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          // If so, mark as a switch and break the loop:
+          shouldSwitch = true;
+          
+          break;
+        }
+      } else if (dir == "desc") {
+        if (xt.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+          // If so, mark as a switch and break the loop:
+          shouldSwitch = true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+      /* If a switch has been marked, make the switch
+      and mark that a switch has been done: */
+                //change the class of the node
+      
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      
+      
+      // Each time a switch is done, increase this count by 1:
+      switchcount ++;
+    } else {
+       
+      /* If no switching has been done AND the direction is "asc",
+      set the direction to "desc" and run the while loop again. */
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+       
+    }
+  }
+  for (i = 0; i < (rows.length - 1); i++) {
+    if(i%2===0){
+         rows[i].className="inactive-row";
+        }
+        else{
+         
+         rows[i].className="active-row";
+        }
+  }
+}
+</script>
         <table  class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="3">Nuevas incorporaciones</th>
+            <th class="centrar" colspan="6">Nuevas incorporaciones</th>
             
         </tr>
         <tr>
-            <th>Nombre</th>
-            <th>Tiempo</th>
-            <th>Rol</th>
+            <th onclick="sortTable(0,'mul-Nvos')">ID</th>
+            <th onclick="sortTable(1,'mul-Nvos')">Nombre</th>
+            <th onclick="sortTable(2,'mul-Nvos')">Tiempo</th>
+            <th onclick="sortTable(3,'mul-Nvos')">Rol</th>
+            <th onclick="sortTable(4,'mul-Nvos')">Lider</th>
+            <th onclick="sortTable(5,'mul-Nvos')">Embajador</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="mul-Nvos">
         <?php
         
         $args = array(
     'meta_query' => array(
          array(
-            'key' => 'Ingreso',
-            'value' => "0",
+            'key' => 'IngresoMeta',
+            'value' => 0,
             'compare' => '>'
         )
     )
 );
 $member_arr = get_users($args);
 if ($member_arr) {
-    $clase = 'class="active-row"';
+    $clase = '';
   foreach ($member_arr as $user) {
     $usuario =  get_user_by('id',$user->ID);
     $aidi = $user->ID;
@@ -286,6 +369,7 @@ if ($member_arr) {
    }
    if(null !== $usuario->first_name && "" !== $usuario->first_name){
       echo '<tr '.$clase.'>';
+      echo '<td>'.$aidi.'</td>';
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
           if(((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600)<1){
             echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/60).' minutos</td>';  
@@ -297,18 +381,20 @@ if ($member_arr) {
           echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600*24)).' días</td>';   
           }
           echo '<td>'.get_user_meta($aidi,"Cargo", true).'</td>';
+          echo '<td>'.get_user_meta($aidi,"Lider", true).'</td>';
+          echo '<td>'.get_user_meta($aidi,"Embajador", true).'</td>';
         echo    '</tr>';
          if($clase == 'class="active-row"'){
-       $clase = "";
+     $clase = "";
    }else if($clase == ""){
-    $clase = 'class="active-row"';   
+  $clase = 'class="active-row"';   
    }
    }
   
   }
 } else {
   echo '<tr class="active-row">
-            <td colspan="3">No se han encontrado usuarios</td>
+            <td colspan="6">No se han encontrado usuarios</td>
         </tr>';
 }
         
@@ -317,7 +403,7 @@ if ($member_arr) {
         
 
        <tr>
-            <td colspan="3"><form method="post">
+            <td colspan="6"><form method="post">
                     <input type="text" name="generarceseve" value="nvasInc"   hidden>
                     
                     <button class="bajarCSV" type="submit">Descargar resumen</button>

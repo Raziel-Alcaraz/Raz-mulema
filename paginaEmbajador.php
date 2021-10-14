@@ -90,7 +90,7 @@ if((intval($interval->format("%a")))<365){
  }
   }
 }
-$conn->close();
+
 ?></h2>
         <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
         <div id="fotoPerfilContainer">
@@ -113,7 +113,7 @@ $conn->close();
             <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
             </div>
             <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo formatoMoneda($gananciasUsr,true); ?></div>
+              <div class="mulermaResaltarCentrar"><?php echo comisiones($ventasUsr); ?></div>
               <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
             </div>
         </div>
@@ -338,11 +338,11 @@ if ($member_arr) {
             <p> Nominado por: <?php
             $nominador_mul = get_user_meta( get_current_user_id(), "Nominador", true );
             $nominador_mul_texto = get_user_by('id',$nominador_mul);
-            echo $nominador_mul_texto; ?></p><br>
+             echo $nominador_mul_texto->first_name." ".$nominador_mul_texto->last_name; ?></p><br>
             <p> Registro en la plataforma: <?php
-            $nominador_mul = get_user_meta( get_current_user_id(), "Ingreso", true );
-            $nominador_mul_texto = get_user_by('id',$nominador_mul);
-            echo $nominador_mul_texto; ?></p>
+            $fecha_mul = get_user_meta( get_current_user_id(), "Ingreso", true );
+           
+             echo $fecha_mul; ?></p> ?></p>
             <p><!--<?php/*
             if(in_array('Invalid form submission.',get_user_meta( get_current_user_id(), "Foto", true ))){
              update_user_meta( get_current_user_id(), "Foto", "https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png");   
