@@ -145,6 +145,10 @@ echo $current_user->user_firstname;
             </div>
         </div>
         <div class="centrar" id="mulemaListas">
+               <?php
+ include("scriptablas.html");
+ 
+ ?>
             <table class="styled-table">
     <thead>
         <tr>
@@ -152,12 +156,12 @@ echo $current_user->user_firstname;
             
         </tr>
         <tr>
-            <th>Nombre</th>
-            <th>Compras</th>
-            <th>Comisión</th>
+            <th  onclick="sortTable(0,'mul-Top')">Nombre</th>
+            <th onclick="sortTable(1,'mul-Top')">Compras</th>
+            <th onclick="sortTable(2,'mul-Top')">Comisión</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="mul-Top">
          <?php
         
         $args = array(
@@ -186,8 +190,34 @@ if ($member_arr) {
    if(null !== $usuario->first_name && "" !== $usuario->first_name){
       echo '<tr '.$clase.'>';
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
-          echo '<td>E/D</td>';
-          echo '<td>E/D</td>';
+          
+          //----------consulta a db inicio------------------------------------------------------------------------------
+            
+  
+include_once("conn.php");
+$sql = "SELECT SUM(`monto_compra`) FROM `wp_mul_hipercubo` where id_cliente='".$aidi."';";
+//echo "<br>".$sql."<br>";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+    $ventasLid=0;
+    
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+    echo "<td>";
+    echo(formatoMoneda($row['SUM(`monto_compra`)']));
+    echo"</td>";  
+     echo "<td>";
+     echo(comisiones($row['SUM(`monto_compra`)']));
+    echo"</td>";   
+      
+  }
+  }
+  }
+     
+//_-------------------consulta a db FIN------------------------------------------------------------------------------    
+          
+         
         echo    '</tr>';
          if($clase == 'class="active-row"'){
        $clase = "";
@@ -225,32 +255,48 @@ if ($member_arr) {
             
         </tr>
         <tr>
-            <th>Nombre</th>
-            <th>Ventas</th>
-            <th>Ganancia</th>
+            <th onclick="sortTable(2,'mul-CTop')">Nombre</th>
+            <th onclick="sortTable(2,'mul-CTop')">Ventas</th>
+            <th onclick="sortTable(2,'mul-CTop')">Ganancia</th>
         </tr>
     </thead>
-    <tbody>
-        <tr>
-            <td>Collares</td>
-            <td>E/D</td>
-            <td>E/D</td>
-        </tr>
-        <tr class="active-row">
-            <td>Bolsos</td>
-            <td>E/D</td>
-            <td>E/D</td>
-        </tr>
-        <tr>
-            <td>Rifles de asalto</td>
-            <td>E/D</td>
-            <td>E/D</td>
-        </tr>
-        <tr class="active-row">
-            <td>Ametralladoras</td>
-            <td>E/D</td>
-            <td>E/D</td>
-        </tr>
+    <tbody id="mul-CTop">
+       <?php
+       
+                //----------consulta a db inicio------------------------------------------------------------------------------
+            
+  for($i=0;$i<100;$i++){
+include_once("conn.php");
+$sql = "SELECT SUM(`monto_compra`) FROM `wp_mul_hipercubo` where id_embajador='".get_current_user_id()."' AND id_categoria='".
+        $i."';";
+//echo "<br>".$sql."<br>";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+    $ventasLid=0;
+    
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+      if($row['SUM(`monto_compra`)']>0){
+          echo "<tr>";
+      echo "<td>";
+    echo(get_term( $i )->name);
+    echo"</td>";
+    echo "<td>";
+    echo(formatoMoneda($row['SUM(`monto_compra`)']));
+    echo"</td>";  
+     echo "<td>";
+     echo(comisiones($row['SUM(`monto_compra`)']));
+    echo"</td>";   
+    echo"</tr>";
+      }
+  }
+  }
+  }
+  } 
+//_-------------------consulta a db FIN------------------------------------------------------------------------------   
+       
+       ?>
        <tr>
             <td colspan="3"><form method="post">
                     <input type="text" name="generarceseve" value="ok"   hidden>

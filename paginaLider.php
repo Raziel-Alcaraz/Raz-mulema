@@ -143,6 +143,10 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
             </div>
         </div>
         <div  class="centrar" id="mulemaListas">
+               <?php
+ include("scriptablas.html");
+ 
+ ?>
             <table class="styled-table">
     <thead>
         <tr>
@@ -150,12 +154,12 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
             
         </tr>
         <tr>
-            <th>Nombre</th>
-            <th>Ventas</th>
-            <th>Comisiones</th>
+            <th onclick="sortTable(0,'mul-Top')">Nombre</th>
+            <th onclick="sortTable(1,'mul-Top')">Ventas</th>
+            <th onclick="sortTable(2,'mul-Top')">Comisiones</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="mul-Top">
   <?php
         
         $args = array(
@@ -182,10 +186,38 @@ if ($member_arr) {
        update_user_meta($aidi,"IngresoMeta",time());
    }
    if(null !== $usuario->first_name && "" !== $usuario->first_name){
+       
+       
       echo '<tr '.$clase.'>';
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
-          echo '<td>E/D</td>';
-          echo '<td>E/D</td>';
+          //----------consulta a db inicio------------------------------------------------------------------------------
+            
+  
+include_once("conn.php");
+$sql = "SELECT SUM(`monto_compra`) FROM `wp_mul_hipercubo` where id_embajador='".$aidi."';";
+//echo "<br>".$sql."<br>";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+    $ventasLid=0;
+    
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+    echo "<td>";
+    echo(formatoMoneda($row['SUM(`monto_compra`)']));
+    echo"</td>";  
+     echo "<td>";
+     echo(comisiones($row['SUM(`monto_compra`)']));
+    echo"</td>";   
+      
+  }
+  }
+  }
+     
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+          
+          
+        
         echo    '</tr>';
            if($clase == 'class="active-row"'){
        $clase = "";
@@ -223,12 +255,12 @@ if ($member_arr) {
             
         </tr>
         <tr>
-            <th>Nombre</th>
-            <th>Tiempo</th>
-            <th>Ventas</th>
+            <th onclick="sortTable(0,'mul-Nvos')">Nombre</th>
+            <th onclick="sortTable(0,'mul-Nvos')">Tiempo</th>
+            <th onclick="sortTable(0,'mul-Nvos')">Ventas</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="mul-Nvos">
       <?php
         
         $args = array(
@@ -266,7 +298,37 @@ if ($member_arr) {
           }else{
           echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600*24)).' días</td>';   
           }
-          echo '<td>E/D</td>';
+          
+          
+                    //----------consulta a db inicio------------------------------------------------------------------------------
+            
+  
+include_once("conn.php");
+$sql = "SELECT SUM(`monto_compra`) FROM `wp_mul_hipercubo` where id_embajador='".$aidi."';";
+//echo "<br>".$sql."<br>";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+    $ventasLid=0;
+    
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+    echo "<td>";
+    echo(formatoMoneda($row['SUM(`monto_compra`)']));
+    echo"</td>";  
+    
+      
+  }
+  }
+  }
+     
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+          
+   
+          
+          
+          
+       
         echo    '</tr>';
          if($clase == 'class="active-row"'){
        $clase = "";

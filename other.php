@@ -215,26 +215,26 @@
     background-color: #208171;
     color: #ffffff;
     text-align: center;
-    border-radius: 4px;
+    //border-radius: 4px;
 }
 .styled-table th,
 .styled-table td {
     padding: 7px 5px;
-    border-radius: 4px;
+    //border-radius: 4px;
 }
 .styled-table tbody tr {
     border-bottom: 1px solid #dddddd;
-    border-radius: 4px;
+    //border-radius: 4px;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
     background-color: #f3f3f3;
-    border-radius: 4px;
+    //border-radius: 4px;
 }
 
 .styled-table tbody tr:last-of-type {
     border-bottom: 2px solid #009879;
-    border-radius: 4px;
+    //border-radius: 4px;
 }
 .styled-table tbody tr.active-row {
     font-weight: bold;
