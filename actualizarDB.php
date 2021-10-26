@@ -34,19 +34,22 @@ $cat_slug = get_term( $cat_id )->name;
     $porcentaje_embajador = 0;
     $num_articulos = $row1["product_qty"];
     $datetime = $row1["date_created"];
+    $ye = substr($datetime, 0,4);
+    $mo = substr($datetime, 5,2);
     $sql2 = "INSERT INTO `wp_mul_hipercubo` VALUES ('".$order_item_id."','".$id_lider."','".$id_embajador."',".
             $id_cliente.",".$id_compra.",".
             $id_categoria.",'".$cat_slug."',".$monto_compra.
-  ",".$porcentaje_lider.",".$porcentaje_embajador.",".$num_articulos.",'".$datetime ."');";
+  ",".$porcentaje_lider.",".$porcentaje_embajador.",".$num_articulos.","
+            .$ye.",".$mo.",'".$datetime ."');";
   //echo "<br>consulta: ". $sql2;
     
-    
-   //var_dump($order_item_id,$id_lider,$id_embajador,$id_cliente,$id_compra,$id_categoria,$cat_slug,$monto_compra,$porcentaje_lider
-           //,$porcentaje_embajador,$num_articulos,$datetime);
+  /*  
+   var_dump($order_item_id,$id_lider,$id_embajador,$id_cliente,$id_compra,$id_categoria,$cat_slug,$monto_compra,$porcentaje_lider
+           ,$porcentaje_embajador,$num_articulos,$ye,$mo,$datetime);*/
     $resultado2 = $conn->query($sql2);
     if($resultado2){
- //echo "<br>-------------------------Resultado: ";
-        //var_dump($resultado2);
+ echo "<br>-------------------------Resultado: ";
+      //  var_dump($resultado2);
     }ELSE{
   //echo "<br>-------------------------NO Resultado: ";
         //var_dump($resultado2); 
@@ -66,7 +69,7 @@ $cat_slug = get_term( $cat_id )->name;
     
 }else{
   
-    $siquel = "CREATE TABLE `basedeprueba`.`wp_mul_hipercubo` ( `order_item_id` INT NOT NULL , `id_lider` VARCHAR(30) , `id_embajador`  VARCHAR(30) , `id_cliente` VARCHAR(30) , `id_compra` INT NOT NULL , `id_categoria` INT NOT NULL ,`slug_categoria` VARCHAR(30) , `monto_compra` INT NOT NULL , `porcentaje_lider` INT NOT NULL , `porcentaje_embajador` INT NOT NULL ,`num_articulos` INT NOT NULL , `datetime` VARCHAR(30) NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`order_item_id`)) ENGINE = InnoDB; ";
+    $siquel = "CREATE TABLE `basedeprueba`.`wp_mul_hipercubo` ( `order_item_id` INT NOT NULL , `id_lider` VARCHAR(30) , `id_embajador`  VARCHAR(30) , `id_cliente` VARCHAR(30) , `id_compra` INT NOT NULL , `id_categoria` INT NOT NULL ,`slug_categoria` VARCHAR(30) , `monto_compra` INT NOT NULL , `porcentaje_lider` INT NOT NULL , `porcentaje_embajador` INT NOT NULL ,`num_articulos` INT NOT NULL ,`ye` INT NOT NULL ,`mo` INT NOT NULL , `datetime` VARCHAR(30) NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`order_item_id`)) ENGINE = InnoDB; ";
 $result = $conn->query($siquel);
 if($result){
  //var_dump($result);

@@ -320,6 +320,194 @@ if ($result->num_rows > 0) {
     <canvas height="200px" width="200px" id="myChart2" style="height:300px; width:300px;display: inline-block;"></canvas>
 </div>
 </div>
+         <?php
+  
+  
+  //----------consulta a db inicio------------------------------------------------------------------------------
+            
+  
+include_once("conn.php");
+$sql3 = "SELECT `mo`,`ye`, SUM(`monto_compra`) FROM `wp_mul_hipercubo`  WHERE id_embajador=".get_current_user_id()." GROUP BY `mo`,`ye`;";
+//echo "<br>".$sql3."<br>";
+$result3 = $conn->query($sql3);
+$anterior = array(
+    1=>0,
+    2=>0,
+    3=>0,
+    4=>0,
+    5=>0,
+    6=>0,
+    7=>0,
+    8=>0,
+    9=>0,
+    10=>0,
+    11=>0,
+    12=>0
+);
+$actual = array(
+    1=>0,
+    2=>0,
+    3=>0,
+    4=>0,
+    5=>0,
+    6=>0,
+    7=>0,
+    8=>0,
+    9=>0,
+    10=>0,
+    11=>0,
+    12=>0 
+);
+if($result3){
+if ($result3->num_rows > 0) {
+
+  // output data of each row
+  while($row3 = $result3->fetch_assoc()) {
+   //var_dump($row3);
+      //echo date("Y");
+     if(intval($row3["ye"]) === intval(date("Y"))){
+      $actual[$row3["mo"]] =   intval($row3['SUM(`monto_compra`)']);
+     } else if(intval($row3["ye"]) === intval(date("Y"))-1){
+       $anterior[$row3["mo"]] =   intval($row3['SUM(`monto_compra`)']);  
+  }
+  }
+  }
+     
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+ 
+}
+//var_dump($anterior, $actual);
+  
+  ?>
+           
+        <script>
+var ctx = document.getElementById('myChart').getContext('2d');
+
+const DATA_COUNT = 7;
+const labels = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const dataAct =[<?php $estring2 =   $actual[1].",".$actual[2].",".$actual[3].",".$actual[4].","
+              .$actual[5].",".$actual[6].",".$actual[7].",".$actual[8].","
+              .$actual[9].",".$actual[10].",".$actual[11].",".$actual[12];
+      echo $estring2;?>];
+const dataAnt=[<?php echo  $anterior[1].",".$anterior[2].",".$anterior[3]
+      .",".$anterior[4].",".$anterior[5].",".$anterior[6].",".$anterior[7].",".$anterior[8].
+              ",".$anterior[9].",".$anterior[10]."," . $anterior[11].",".$anterior[12];
+     ?>];
+                  
+    console.log(dataAct);       
+    console.log(dataAnt); 
+const data = {
+  labels: labels,
+  datasets: [
+      {
+      label: 'Actual',
+      data: dataAct,
+      borderColor: 'rgba(0, 152, 121, 1)',
+      backgroundColor: 'rgba(0, 152, 121, .2)',
+      fill:true
+    },
+    {
+      label: 'Año anterior',
+      data: dataAnt,
+      borderColor: 'rgba(192, 75, 192, 1)',
+      backgroundColor: 'rgba(192, 75, 192, 0.2)'
+    }
+    
+  ]
+};
+const config = {
+  type: 'line',
+  data: data,
+  options: {
+    responsive: true,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    stacked: true,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Comparativo de ventas'
+      }
+    },
+  
+  },
+};
+const actions = [
+  {
+    name: 'Randomize',
+    handler(chart) {
+      chart.data.datasets.forEach(dataset => {
+        dataset.data = Utils.numbers({count: chart.data.labels.length, min: -100, max: 100});
+      });
+      chart.update();
+    }
+  },
+];
+var myChart = new Chart(ctx, config);
+
+//-----------------------------------
+ //----------consulta a db inicio------------------------------------------------------------------------------
+  </script>          
+ <?php 
+include_once("conn.php");
+$sql4 = "SELECT `slug_categoria`, SUM(`monto_compra`) FROM `wp_mul_hipercubo` WHERE id_embajador=".get_current_user_id()." GROUP BY `slug_categoria`;";
+//echo "<br>".$sql4."<br>";
+$result4 = $conn->query($sql4);
+$llaves = array();
+if($result4){
+if ($result4->num_rows > 0) {
+
+  // output data of each row
+  while($row4 = $result4->fetch_assoc()) {
+   if(intval($row4["SUM(`monto_compra`)"])>1500){
+       $llaves[$row4["slug_categoria"]] = $row4["SUM(`monto_compra`)"];
+   }
+  }
+  }
+}  
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+ ?>
+  <script> 
+var ctx2 = document.getElementById('myChart2').getContext('2d');
+ 
+const data2 = {
+  labels: [
+   <?php
+   foreach ($llaves as $key => $value) {
+    echo "'".$key."',";
+}
+  
+   ?>
+  ],
+  datasets: [{
+    label: 'Categorías',
+    data: [   <?php
+   foreach ($llaves as $key => $value) {
+    echo $value.",";
+}
+  
+   ?>],
+    backgroundColor: [
+      'rgb(255, 99, 132)',
+      'rgb(75, 192, 192)',
+      'rgb(255, 205, 86)',
+      'rgb(201, 203, 207)',
+      'rgb(54, 162, 235)'
+    ]
+  }]
+};
+   const config2 = {
+  
+};
+var myChart2 = new Chart(ctx2, {
+type: 'polarArea',
+  data: data2,
+  options: {resizable: false}
+});
+
+</script>
 <div id="mulema-agregar" class="centrar">
     <form method="post">
             <h2>Agregar cliente</h2> 
@@ -396,58 +584,45 @@ if ($result->num_rows > 0) {
             echo( get_user_meta( get_current_user_id(), "Foto", true ));  */?>--></p>
             <br><br>+<br>
         </div>
-<script>
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['Enero', 'Febrero','Marzo','Abril','Mayo','Junio'],
-        datasets: [{
-            label: 'Ventas (mdp)',
-            data: [4, 5, 2, 3, 9, 5],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                '#208171',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 10
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
+<?php 
+include_once("conn.php");
+$sql4 = "SELECT `slug_categoria`, SUM(`monto_compra`) FROM `wp_mul_hipercubo` WHERE id_lider=".get_current_user_id()." GROUP BY `slug_categoria`;";
+//echo "<br>".$sql4."<br>";
+$result4 = $conn->query($sql4);
+$llaves = array();
+if($result4){
+if ($result4->num_rows > 0) {
 
-//-----------------------------------
-
+  // output data of each row
+  while($row4 = $result4->fetch_assoc()) {
+   if(intval($row4["SUM(`monto_compra`)"])>1500){
+       $llaves[$row4["slug_categoria"]] = $row4["SUM(`monto_compra`)"];
+   }
+  }
+  }
+}  
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+ ?>
+  <script> 
 var ctx2 = document.getElementById('myChart2').getContext('2d');
  
-const data = {
+const data2 = {
   labels: [
-    'Bolsos',
-    'Joyería',
-    'Submarinos checoslovacos',
-    'Minas antitanque',
-    'Otros',
+   <?php
+   foreach ($llaves as $key => $value) {
+    echo "'".$key."',";
+}
+  
+   ?>
   ],
   datasets: [{
     label: 'Categorías',
-    data: [3, 1, 4, 5, 4],
+    data: [   <?php
+   foreach ($llaves as $key => $value) {
+    echo $value.",";
+}
+  
+   ?>],
     backgroundColor: [
       'rgb(255, 99, 132)',
       'rgb(75, 192, 192)',
@@ -457,12 +632,12 @@ const data = {
     ]
   }]
 };
-   const config = {
+   const config2 = {
   
 };
 var myChart2 = new Chart(ctx2, {
 type: 'polarArea',
-  data: data,
+  data: data2,
   options: {resizable: false}
 });
 

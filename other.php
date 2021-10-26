@@ -267,3 +267,26 @@ font-weight: bold;
 text-align: center;
 border:none;
 }
+
+.fondoCotizador{
+background-color: white;
+width: 100%;
+height: 300vh;
+}
+
+.optionsCotizMulema{
+text-align: left;
+
+}
+.centrar2{
+    text-align: center;
+    max-width: 75%;
+    margin: auto;
+    display: block;
+}
+.aidis{
+display:none;
+}
+.xaidis{
+display:none;
+}

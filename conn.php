@@ -1,8 +1,8 @@
 <?php
-$servername = "localhost";
-$username = "administreitor";
-$password = "p98q12t45";
-$base = "basedeprueba";
+$servername = DB_HOST;
+$username = DB_USER;
+$password = DB_PASSWORD;
+$base = DB_NAME;
 // Create connection
 $conn = new mysqli($servername, $username, $password, $base);
 

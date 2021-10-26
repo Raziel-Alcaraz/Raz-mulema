@@ -135,11 +135,11 @@ function process_post() {
  function mulema_setup_user_types() {
  $role = "Lider";
  $display_name = "Lider";
- $capabilitiesLid = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>true, 
+ $capabilitiesLid = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>false, 
      'view_admin_dashboard' =>true, 'mulema_lider'=>true );
- $capabilitiesCli = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>true, 
+ $capabilitiesCli = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>false, 
      'view_admin_dashboard' =>true );
- $capabilitiesEmb = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>true, 
+ $capabilitiesEmb = array('promote_users' => true, 'read' => true, 'edit_dashboard' =>false, 
      'view_admin_dashboard' =>true, 'mulema_embajada'=>true );
      add_role( $role, $display_name, $capabilitiesLid );
      
@@ -162,6 +162,7 @@ function process_post() {
    add_menu_page( 'Líder', 'Líder', 'mulema_lider', 'mulema_p0', 'mulema_lider_panel' );
  add_menu_page( 'Embajador', 'Embajador', 'mulema_embajada', 'mulema_p1', 'mulema_embajada_panel' );
   add_menu_page( 'Superadmin', 'Superadmin', 'manage_options', 'mulema_p2', 'mulema_superadmin_panel' );
+  add_menu_page( 'Cotizador', 'Cotizador', 'view_admin_dashboard', 'mulema_p3', 'mulema_cotizador_panel' );
  }
  function mulema_lider_panel(){
 $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
@@ -188,6 +189,15 @@ function mulema_superadmin_panel(){
     
 include('paginaSuperadmin.php');
 }
+
+function mulema_cotizador_panel(){
+   $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';
+     echo'<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>';
+ $ventasUsr = 0;
+ $gananciasUsr = 0;
+    
+include('paginaCotizador.php');
+}
  add_action( 'admin_menu', 'mulema_add_panels' );
  
  function mulema_chartjs(){
@@ -212,12 +222,20 @@ add_action( 'login_enqueue_scripts', 'my_login_logo' );
  /**
   * Activate the plugin.
   */
+
+     function my_footer_shh() {
+    remove_filter( 'update_footer', 'core_update_footer' ); 
+    remove_filter( 'admin_footer_text', 'core_update_footer' ); 
+}
+
+add_action( 'admin_menu', 'my_footer_shh' );
  function mulema_activate() {
  if (function_exists('woocommerce')){
      // Trigger our function that registers the custom post type plugin.
      mulema_setup_user_types();
      
      mulema_add_panels();
+
      // Clear the permalinks after the post type has been registered.
      
 //consulta a DB inicio---------------------------------------------------------------------
@@ -226,7 +244,7 @@ add_action( 'login_enqueue_scripts', 'my_login_logo' );
      
      
 //consulta a DB fin---------------------------------------------------------------------
-     
+     flush_rewrite_rules();
      
      flush_rewrite_rules();
      }
