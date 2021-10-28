@@ -99,7 +99,7 @@
     transform: translate(0, -50%);
 
     width: 161px;
-    background: #208171;
+    background: #2c5796;
     border-radius: 8px;
    /* border: 1px white solid; */
     padding: 5px;
@@ -127,7 +127,7 @@
     transform: translate(0, -50%);
 
     width: 161px;
-    background: #208171;
+    background: #2c5796;
     border-radius: 8px;
    /* border: 1px white solid; */
     padding: 5px;
@@ -171,6 +171,14 @@
   -ms-text-justify: distribute-all-lines;
   text-justify: distribute-all-lines;
      }
+     .triplesContBtn{
+        width: 75%;
+        display: block;
+         margin: auto;
+          text-align: justify;
+  -ms-text-justify: distribute-all-lines;
+  text-justify: distribute-all-lines;
+     }
      .triples{
     display: inline-block;
     margin: auto;
@@ -179,7 +187,43 @@
     width: auto;
     min-width: 20%;
     max-width: 31%;
-    background: #208171;
+    background: #2c5796;
+    border-radius: 16px;
+   /* border: 1px white solid; */
+    padding: 0vw;
+    margin-bottom: 10px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border:none;
+    }
+    .triplesBtn{
+    display: inline-block;
+    margin: auto;
+    height: 12vh;
+    min-height: 95px;
+    width: auto;
+    min-width: 20%;
+    max-width: 31%;
+    background: #2c5796;
+    border-radius: 16px;
+   /* border: 1px white solid; */
+    padding: 0vw;
+    margin-bottom: 10px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border:none;
+    }
+      .botoncentrado{
+    display: block;
+    margin: auto;
+    height: 12vh;
+    min-height: 95px;
+    width: auto;
+    min-width: 20%;
+    max-width: 31%;
+    background: #2c5796;
     border-radius: 16px;
    /* border: 1px white solid; */
     padding: 0vw;
@@ -212,7 +256,7 @@
     border-radius: 4px;
 }
 .styled-table thead tr {
-    background-color: #208171;
+    background-color: #2c5796;
     color: #ffffff;
     text-align: center;
     //border-radius: 4px;
@@ -233,12 +277,12 @@
 }
 
 .styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
+    border-bottom: 2px solid #2c5796;
     //border-radius: 4px;
 }
 .styled-table tbody tr.active-row {
     font-weight: bold;
-    color: #009879;
+    color: #2c5796;
 }
 .centrar{
     text-align: center;
@@ -259,7 +303,7 @@ text-align: center;
 .bajarcsv{
 width: 100%;
 margin: auto;
-background: #208171;
+background: #2c5796;
 border-radius: 8px;
 padding: 5px;
 color: white;
@@ -285,6 +329,8 @@ text-align: left;
     display: block;
 }
 .aidis{
+display:none;
+}.aidisT{
 display:none;
 }
 .xaidis{

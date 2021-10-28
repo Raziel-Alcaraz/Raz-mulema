@@ -122,6 +122,26 @@ function process_post() {
         // echo "escribiendo csv";
          include_once("actualizarDB.php");
          actualizarDB();
+     }else if ( isset( $_POST['agregarAlPincheCarro'] ) ){
+        // die(strval(intval(Date("j")+1)). Date(" F, Y"));
+        wc()->frontend_includes();
+              WC()->session = new WC_Session_Handler();
+WC()->session->init();
+WC()->customer = new WC_Customer( get_current_user_id(), true );
+WC()->cart = new WC_Cart();
+WC()->cart->empty_cart();
+         foreach($_POST as $key => $value) {
+  echo "POST parameter '$key' has '$value'<br>";
+  global $woocommerce;
+  if($value!="si"){
+ 
+WC()->cart->add_to_cart( $key, $value ); 
+  }
+}if(true){
+    include_once("crearCupones.php");
+    
+    WC()->cart->apply_coupon( crearCupon() );
+wp_safe_redirect( wc_get_checkout_url() );   }   
      }
      else{
     //echo "------------nada-------";

@@ -432,14 +432,14 @@ const data = {
       {
       label: 'Actual',
       data: dataAct,
-      borderColor: 'rgba(0, 152, 121, 1)',
-      backgroundColor: 'rgba(0, 152, 121, .2)',
+      borderColor: 'rgba(21, 101, 192, 1)',
+      backgroundColor: 'rgba(21, 101, 192, .2)',
       fill:true
     },
     {
       label: 'Año anterior',
       data: dataAnt,
-      borderColor: 'rgba(192, 75, 192, 1)',
+      borderColor: 'rgba(0, 152, 121, 1)',
       backgroundColor: 'rgba(192, 75, 192, 0.2)'
     }
     
