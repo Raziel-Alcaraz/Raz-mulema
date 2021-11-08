@@ -105,7 +105,7 @@ if((intval($interval->format("%a")))<365){
             <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
             </div>
             <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo comisiones($ventasUsr); ?></div>
+              <div class="mulermaResaltarCentrar"><?php echo comisiones($ventasUsr, get_current_user_id()); ?></div>
               <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
             </div>
         </div>
@@ -150,13 +150,14 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
             <table class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="3">Embajadores TOP</th>
+            <th class="centrar" colspan="4">Mi red</th>
             
         </tr>
         <tr>
             <th onclick="sortTable(0,'mul-Top')">Nombre</th>
             <th onclick="sortTable(1,'mul-Top')">Ventas</th>
             <th onclick="sortTable(2,'mul-Top')">Comisiones</th>
+            <th onclick="sortTable(3,'mul-Top')">Esquema</th>
         </tr>
     </thead>
     <tbody id="mul-Top">
@@ -188,7 +189,7 @@ if ($member_arr) {
    if(null !== $usuario->first_name && "" !== $usuario->first_name){
        
        
-      echo '<tr '.$clase.'>';
+      echo '<tr '.$clase."><form method='post'>";
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
           //----------consulta a db inicio------------------------------------------------------------------------------
             
@@ -207,8 +208,31 @@ if ($result->num_rows > 0) {
     echo(formatoMoneda($row['SUM(`monto_compra`)']));
     echo"</td>";  
      echo "<td>";
-     echo(comisiones($row['SUM(`monto_compra`)']));
-    echo"</td>";   
+     echo(comisiones($row['SUM(`monto_compra`)'], get_current_user_id()));
+    echo"</td>";  
+     echo "<td>";
+     echo ""
+     . '<input name="esquemaMul" value="si"/ hidden>'
+             . '<input name="username" value="'.$aidi.'" hidden/>'
+             . '<select name="esquema" onchange="cambioEsquema('.$aidi.')">
+                <option value="50"';
+             if(get_user_meta($aidi,"esquemaValor", true)==50){
+                 echo "selected";
+             }
+             echo '>Clase C: 50%</option>'.
+                '<option value="35"';
+              if(get_user_meta($aidi,"esquemaValor", true)==35){
+                 echo "selected";
+             }
+             echo'>Clase B: 35%</option>'.
+                '<option value="20"';
+              if(get_user_meta($aidi,"esquemaValor", true)==20){
+                 echo "selected";
+             }
+             echo'>Clase A: 20%</option>'.
+            '</select>'
+             . "<button type='submit' id='botonCambioEsquema-". $aidi."' hidden>Cambiar</button>";
+    echo"</td>";  
       
   }
   }
@@ -218,7 +242,7 @@ if ($result->num_rows > 0) {
           
           
         
-        echo    '</tr>';
+        echo    '</form></tr>';
            if($clase == 'class="active-row"'){
        $clase = "";
    }else if($clase == ""){
@@ -229,14 +253,14 @@ if ($result->num_rows > 0) {
   }
 } else {
   echo '<tr class="active-row">
-            <td colspan="3">No se han encontrado usuarios</td>
+            <td colspan="4">No se han encontrado usuarios</td>
         </tr>';
 }
         
         
         ?>
         <tr>
-            <td colspan="3"><form method="post">
+            <td colspan="4"><form method="post">
                     <input type="text" name="generarceseve" value="ok"   hidden>
                     
                     <button class="bajarCSV" type="submit">Descargar resumen</button>
@@ -432,6 +456,7 @@ if ($result3->num_rows > 0) {
   ?>
            
         <script>
+         
 var ctx = document.getElementById('myChart').getContext('2d');
 
 const DATA_COUNT = 7;
@@ -557,7 +582,12 @@ type: 'polarArea',
   data: data2,
   options: {resizable: false}
 });
+function cambioEsquema(cual){
+$("#botonCambioEsquema-"+cual).show();
 
+console.log($("#botonCambioEsquema-"+cual));
+
+}
 </script>
 <div id="mulema-agregar" class="centrar">
     <form method="post">
@@ -567,6 +597,12 @@ type: 'polarArea',
             <p>Email: <br><input name="mulema_user_mail" type="text"/></p>
             <p>Nombre: <br><input name="first_name" type="text"/></p>
             <p>Apellido: <br><input name="last_name" type="text"/></p>
+            Esquema: <br><select name="esquema">
+                <option value="50">Clase C: 50%</option>
+                <option value="35">Clase B: 35%</option>
+                <option value="20">Clase A: 20%</option>
+            </select>
+            <br>
             <input hidden name="mulema_user_role" value="Embajador"/>
             <br><br><button class="mul-botonCobrar" type="submit">Agregar</button>
             <br><br>

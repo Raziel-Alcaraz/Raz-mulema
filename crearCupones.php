@@ -1,11 +1,11 @@
 <?php
-function crearCupon(){
+function crearCupon($cuanto){
     /**
 * Create a coupon programatically
 */
     
 $coupon_code = substr(hash('gost',strval(round(microtime(true) * 1000)),false),0,8); // Code
-$amount = '35'; // Amount
+$amount = $cuanto;// Amount
 $discount_type = 'percent'; // Type: fixed_cart, percent, fixed_product, percent_product
 
 $coupon = array(

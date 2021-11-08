@@ -58,12 +58,29 @@ function process_post() {
     'description' => $descripcion         
 );
         $userId = wp_insert_user($user);
-       
+       if(gettype( $userId) != "integer"){
+         //var_dump($user);
+         var_dump($userId);
+         die("error al agregar");
+       }
         echo "Agregado un usuario con ID: ". $userId;
          update_user_meta( $userId, "Nominador", get_current_user_id());
          update_user_meta( $userId, "Ingreso", date("l jS \d\e F \d\e Y h:i:s A", time()));
          update_user_meta( $userId, "IngresoMeta", time());
          update_user_meta( $userId, "Foto", "https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png");
+         if(isset( $_POST['esquemaValor'])){
+         update_user_meta( $userId, "esquemaValor", $_POST['esquemaValor']);
+          $esquemaNombre = "Clase A";
+         if( intVal($_POST['esquemaValor']== 20)){
+            $esquemaNombre = "Clase A";    
+         }else if( intVal($_POST['esquemaValor']== 35)){
+            $esquemaNombre = "Clase B";    
+         } else if( intVal($_POST['esquemaValor']== 50)){
+            $esquemaNombre = "Clase C";    
+         }
+         update_user_meta( $userId, "esquemaNombre", $esquemaNombre);
+         }
+        
          
        if($_POST['mulema_user_role'] == "Embajador"){
           update_user_meta( $userId, "Cargo", "EMBAJADOR(A) REGIONAL");
@@ -140,8 +157,25 @@ WC()->cart->add_to_cart( $key, $value );
 }if(true){
     include_once("crearCupones.php");
     
-    WC()->cart->apply_coupon( crearCupon() );
+     WC()->cart->apply_coupon( crearCupon(get_user_meta(get_current_user_id(),"esquemaValor", true)) );
 wp_safe_redirect( wc_get_checkout_url() );   }   
+     }
+    else if( isset( $_POST['esquemaMul'] ) &&
+            isset( $_POST['esquema'] )) {
+        
+        //cambiar esquema-------------------------------------------------------------------
+        update_user_meta( $_POST['username'], "esquemaValor", $_POST['esquema']); 
+         $esquemaNombre = "";
+         if( intVal($_POST['esquema']== 20)){
+            $esquemaNombre = "Clase A";    
+         }else if( intVal($_POST['esquema']== 35)){
+            $esquemaNombre = "Clase B";    
+         } else if( intVal($_POST['esquema']== 50)){
+            $esquemaNombre = "Clase C";    
+         }
+       
+     update_user_meta( $_POST['username'], "esquemaNombre",  $esquemaNombre); 
+   
      }
      else{
     //echo "------------nada-------";

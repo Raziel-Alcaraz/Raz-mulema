@@ -113,7 +113,7 @@ if((intval($interval->format("%a")))<365){
             <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
             </div>
             <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo   comisiones($ventasUsr); ?></div>
+              <div class="mulermaResaltarCentrar"><?php echo   comisiones(get_current_user_id(),$ventasUsr); ?></div>
               <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
             </div>
         </div>
@@ -206,7 +206,7 @@ if ($result->num_rows > 0) {
     echo(formatoMoneda($row['SUM(`monto_compra`)']));
     echo"</td>";  
      echo "<td>";
-     echo(comisiones($row['SUM(`monto_compra`)']));
+     echo(comisiones(get_current_user_id(),$row['SUM(`monto_compra`)']));
     echo"</td>";   
       
   }
@@ -552,8 +552,6 @@ type: 'polarArea',
     </form>
 </div> 
         
-
-
 </div>
  </div>
 <?php

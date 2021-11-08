@@ -6,6 +6,10 @@ include_once('other.php');
 ?>
 </style>
 <?php
+if(null ==(get_user_meta( get_current_user_id(), "esquemaValor", true ))){
+    update_user_meta( get_current_user_id(), "esquemaValor", 20);
+    update_user_meta( get_current_user_id(), "esquemaNombre", "Clase A");
+}
 include_once("formatoMoneda.php");
 $lain = array();
 ?>
@@ -14,14 +18,11 @@ $lain = array();
 <div class="fondoCotizador">
     <h3 class="centrar">Cotizador</h3>
     <br>
-    <label class="centrar2">Producto</label>
-    <select  class="centrar2" name="cosa" id="cosaMulema">
-    <?php  
-  
-  
-    
-    
-       $taxonomy     = 'product_cat';
+     <label class="centrar2">Categoría</label>
+    <select  class="centrar2" name="cat" onChange="cambiarCat()" id="catMulema">
+     <?php
+     
+         $taxonomy     = 'product_cat';
   $orderby      = 'name';  
   $show_count   = 0;      // 1 for yes, 0 for no
   $pad_counts   = 0;      // 1 for yes, 0 for no
@@ -42,9 +43,50 @@ $lain = array();
  $all_categories = get_categories( $args );
  foreach ($all_categories as $cat) {
     if($cat->category_parent == 0) {
-        $category_id = $cat->term_id;       
-        echo '<option class="centrar2" value="0" disabled>---'. strtoupper($cat->name) .'---</option>';
+        
+        $category_id = $cat->term_id;   
+       
+       echo '<option class="centrar2" value="'.$category_id.'"  >'. strtoupper($cat->name) .'</option>';
+ 
+    }       
+}
+     
+     ?>
+    </select>
+        <br>
+    <label class="centrar2">Producto</label>
+    <select  class="centrar2" name="cosa" onChange="cambiarVar()" id="cosaMulema">
+    <?php  
+  
+  $category_id =0;
+  $refcat =0;  
+    
+       $taxonomy     = 'product_cat';
+  $orderby      = 'name';  
+  $show_count   = 0;      // 1 for yes, 0 for no
+  $pad_counts   = 0;      // 1 for yes, 0 for no
+  $hierarchical = 1;      // 1 for yes, 0 for no  
+  $title        = '';  
+  $empty        = 0;
 
+  $args = array(
+         'taxonomy'     => $taxonomy,
+         'orderby'      => $orderby,
+         'show_count'   => $show_count,
+         'pad_counts'   => $pad_counts,
+         'hierarchical' => $hierarchical,
+         'title_li'     => $title,
+         'hide_empty'   => $empty
+  );
+
+ $all_categories = get_categories( $args );
+ foreach ($all_categories as $cat) {
+    if($cat->category_parent == 0) {
+        
+        $category_id = $cat->term_id;   
+        echo '<optgroup class="centrar2" id="'.$category_id.'" >';
+     //   echo '<option class="centrar2" value="0" disabled>---'. strtoupper($cat->name) .'---</option>';
+ 
         $args2 = array(
                 'taxonomy'     => $taxonomy,
                 'child_of'     => 0,
@@ -71,9 +113,11 @@ $lain = array();
     while ( $loop->have_posts() ) : $loop->the_post();
         global $product;
      //   echo '<br /><a href="'.get_permalink().'">--'.get_the_title().'</a>';
+       if(!in_array($product->get_id(),$lain,true)){
         echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'. $product->get_title() .'</option>';
-        $lain[$product->get_id()] = "{title: '".$product->get_title()."',"
-                 . "price: ".$product->get_price()."}";
+         $lain[$product->get_id()] = "['".$product->get_title()."',"
+                 . "".$product->get_price()."]";
+               }
     endwhile;
 
     wp_reset_query();
@@ -91,17 +135,56 @@ $lain = array();
     while ( $loop->have_posts() ) : $loop->the_post();
         global $product;
        // echo '<br /><a href="'.get_permalink().'">-'.get_the_title().'</a>';
-         echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'. $product->get_title() .'</option>';
-       $lain[$product->get_id()] = "['".$product->get_title()."',"
+        if(!in_array($product->get_id(),$lain,true)){
+        echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'. $product->get_title() .'</option>';
+         $lain[$product->get_id()] = "['".$product->get_title()."',"
                  . "".$product->get_price()."]";
+               }
     endwhile;
-
+if($category_id != $refcat && $category_id != 0){
+        echo    "</optgroup>";
+        $refcat = $category_id;
+        }
     wp_reset_query();
     }       
 }
 ?>
     </select>
+    
+    
+    
+    
     <br>
+     <label class="centrar2">Variaciones</label>
+    <select id="variationsMul" name="var"    class="centrar2">
+        <?php     
+        foreach ($lain as $i => $value) {
+   
+
+$product = wc_get_product($i);
+$current_products = $product->get_children();
+echo "<optgroup id='".$i."'>";
+ foreach ($current_products as $j => $value) {
+     if(isset($value) && ($value)>1){
+         $product = wc_get_product($value);
+    if(!in_array($product->get_id(),$lain,true)){
+        echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'. $product->get_title() .'</option>';
+         $lain[$product->get_id()] = "['".$product->get_title()."',"
+                 . "".$product->get_price()."]";
+               }
+     }
+    
+ }
+ echo "</optgroup>";
+
+ }
+
+        ?>
+    </select>
+    
+    
+    
+    
     <label class="centrar2">Cantidad (piezas)</label>
     <input class="centrar2" value="1" type="number" id="numeroCosasMulema"/>
     <br><br><br>
@@ -129,11 +212,11 @@ $lain = array();
   <thead> <tr>
        
         <th class="COSAS">Descripción</th>
-        <th class="sumaP1" class="xp3">Cantidad</th>
+        <th class="sumaP1" >Cantidad</th>
         <th id="mul_pricename">Precio al público</th>
-        <th class="sumaP2">Descuento</th>
+        <th class="sumaP2">Descuento <?php echo get_user_meta(get_current_user_id(), "esquemaNombre", true ); ?></th>
         
-        <th class="sumaP4">Costo</th>
+        <th class="sumaP4">Monto a pagar</th>
         <th class="sumaP5">Utilidad</th>
          <th class="aidis" hidden>ID</th>
         </tr>
@@ -164,7 +247,14 @@ $lain = array();
   currency: 'MXN',
 });   
     function mul_agregar(){
-         if(parseInt(document.getElementById("numeroCosasMulema").value)>0){ 
+        var valorvariante = document.getElementById("variationsMul").value;
+        console.log(valorvariante);
+        if(valorvariante===""){
+            valorvariante = null;
+        }
+         console.log(valorvariante);
+         if(parseInt(document.getElementById("numeroCosasMulema").value)>0
+                 && document.getElementById("cosaMulema").value !== null){ 
           mul_Privado();
           console.log(lain);
      var element = "<td>"+lain.get('13')[0]+"</td>";
@@ -189,6 +279,9 @@ $lain = array();
       tdi3.className = "xP3";
       tdi3.type="number";
       tdi3.name=document.getElementById("cosaMulema").value;
+      if(valorvariante !== null){
+       tdi3.name=valorvariante;   
+    }
       tdi3.addEventListener("change",function() {
   
   cambiarMulCant(tdi3,td1,td2,td4,td5,tdi6);
@@ -202,13 +295,28 @@ $lain = array();
      
       tr.className = "active-row";
       td0.innerText = lain.get(document.getElementById("cosaMulema").value)[0];
+      if(valorvariante !== null){
+      
+        td0.innerText = lain.get(valorvariante)[0];
+    }
       tdi3.value = parseInt(document.getElementById("numeroCosasMulema").value);
       td1.innerText = parseFloat(lain.get(document.getElementById("cosaMulema").value)[1])
               *parseInt(document.getElementById("numeroCosasMulema").value);
-      td2.innerText = parseFloat(td1.innerText)*.35; 
-      td4.innerText = parseFloat(td1.innerText)*.65;
-      td5.innerText = parseFloat(td1.innerText)*.35;
+      
+      if(valorvariante !== null){
+       td1.innerText = parseFloat(lain.get(valorvariante)[1])
+              *parseInt(document.getElementById("numeroCosasMulema").value);
+       
+    }
+      
+      td2.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ) ?>; 
+      td4.innerText = parseFloat(td1.innerText)*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))) ?>;
+      td5.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ) ?>;
       tdi6.value = document.getElementById("cosaMulema").value;
+      if(valorvariante !== null){
+      tdi6.value = valorvariante;
+       
+    }
       var puedeagregar = false;
       var cuantosvan =0;
       $('#cotizacionMulema').each(function(){
@@ -217,10 +325,17 @@ $lain = array();
     $(this).find('.aidis').each(function(){
         console.log("abreciclo");
        cuantosvan++;
-       if ($(this).val()===document.getElementById("cosaMulema").value){
+       if ($(this).val()===document.getElementById("cosaMulema").value ||
+            (
+           $(this).val()===valorvariante 
+           && valorvariante!= null 
+               ) ){
             console.log("duplicado");
           td0.innerText = lain.get(document.getElementById("cosaMulema").value)[0];
-     
+     if(valorvariante !== null){
+        
+       td0.innerText = lain.get(valorvariante)[0];
+        }
       
       console.log("reemplazando");
       $(this).parent("td").parent("tr").find('.xP3').each(function(){
@@ -231,12 +346,19 @@ $lain = array();
         console.log(tdi3.value);
        td1.innerText = parseFloat(lain.get(document.getElementById("cosaMulema").value)[1])
               *parseInt(tdi3.value);
+      if(valorvariante !== null){
+         td1.innerText = parseFloat(lain.get(valorvariante)[1])
+              *parseInt(tdi3.value); 
+        }
+      td2.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ); ?> ;
       
-      td2.innerText = parseFloat(td1.innerText)*.35;
-      
-      td4.innerText = parseFloat(td1.innerText)*.65;
-      td5.innerText = parseFloat(td1.innerText)*.35;
+      td4.innerText = parseFloat(td1.innerText)*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))); ?>;
+      td5.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ); ?> ;
       tdi6.value = document.getElementById("cosaMulema").value;
+      if(valorvariante !== null){
+         
+      tdi6.value = valorvariante;
+        }
       });
       td3.append(tdi3);
       td6.append(tdi6);
@@ -341,9 +463,9 @@ $lain = array();
           var multiplier = document.getElementById("numeroCosasMulema").value;
           console.log(valor);
           document.getElementById("mulR1"+num).innerHTML = formatter.format((valor*multiplier));
-          document.getElementById("mulR2"+num).innerHTML = formatter.format((valor*multiplier*.65));
-          document.getElementById("mulR3"+num).innerHTML = formatter.format((valor*multiplier*.65));
-          document.getElementById("mulR4"+num).innerHTML = formatter.format((valor*multiplier*.35));
+          document.getElementById("mulR2"+num).innerHTML = formatter.format((valor*multiplier*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))); ?>));
+          document.getElementById("mulR3"+num).innerHTML = formatter.format((valor*multiplier*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))); ?>));
+          document.getElementById("mulR4"+num).innerHTML = formatter.format((valor*multiplier*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ); ?> ));
         }
         // Create our number formatter.
 function mandarDatos(){
@@ -360,9 +482,9 @@ function cambiarMulCant(tdi3,td1,td2,td4,td5, tdi6){
     console.log(tdi6);
     console.log(lain);
     td1.innerText = parseFloat(lain.get(tdi6.value)[1])*parseFloat(tdi3.value);
-    td2.innerText = parseFloat(td1.innerText)*.35;
-    td4.innerText = parseFloat(td1.innerText)*.65;
-    td5.innerText = parseFloat(td1.innerText)*.35;
+    td2.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ) ?> ;
+    td4.innerText = parseFloat(td1.innerText)*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))) ?>;
+    td5.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ) ?> ;
     
     
     sumarTodoElPedo("cero");
@@ -455,7 +577,48 @@ $('#row_productos tr').each(function(){
 
 
 }
-        
+ function cambiarCat(cual){
+     console.log($("#catMulema").val());
+   $('#cosaMulema').each(function(){
+      
+    $(this).find('optgroup').each(function(){
+         console.log($(this).attr('id'));
+       if($(this).attr('id')!=$("#catMulema").val()){
+           $(this).hide();
+           console.log($(this));
+       }else{
+         $(this).show();  
+        }
+     
+    });  
+    }); 
+       $('#cosaMulema').each(function(){
+     $(this).find('option').each(function(){
+         console.log($(this));
+       if($(this).parent("optgroup").is(":visible")){
+         $("#cosaMulema").val($(this).attr('id')).change();  
+        }
+    });
+    });
+     $('#variationsMul').val(null);
+    }
+     function cambiarVar(){
+     console.log("CV");
+   $('#variationsMul').each(function(){
+       
+    $(this).find('optgroup').each(function(){
+          
+       if($(this).attr('id')!==$("#cosaMulema").val()){
+           $(this).hide();
+          
+       }else{
+         $(this).show();  
+        }
+     
+    });  
+    }); 
+     $('#variationsMul').val(null);
+    }
     </script>    
 <div>
 </div>

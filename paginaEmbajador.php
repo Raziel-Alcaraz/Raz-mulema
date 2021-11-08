@@ -7,6 +7,11 @@ $vtasHoy=0;
 $vtasMes = 0;
 $vtasAnio = 0;
 include_once("formatoMoneda.php");
+
+if(null !== (get_user_meta( get_current_user_id(), "esquemaValor", true ))){
+    update_user_meta( get_current_user_id(), "esquemaValor", 15);
+    update_user_meta( get_current_user_id(), "esquemaNombre", "Clase A");
+}
 ?>
 </style>
 <div id="mulema-caratula">
@@ -113,7 +118,7 @@ if((intval($interval->format("%a")))<365){
             <p class="mulCarSup3in"><i class="bi bi-cash-stack"></i> VENTAS</p>
             </div>
             <div class="mulRightHalf">
-              <div class="mulermaResaltarCentrar"><?php echo comisiones($ventasUsr); ?></div>
+              <div class="mulermaResaltarCentrar"><?php echo comisiones($ventasUsr, get_current_user_id()); ?></div>
               <p class="mulCarSup3in"><i class="bi bi-currency-dollar"></i> GANANCIA</p>
             </div>
         </div>
@@ -208,7 +213,7 @@ if ($result->num_rows > 0) {
     echo(formatoMoneda($row['SUM(`monto_compra`)']));
     echo"</td>";  
      echo "<td>";
-     echo(comisiones($row['SUM(`monto_compra`)']));
+     echo(comisiones($row['SUM(`monto_compra`)'], get_current_user_id()));
     echo"</td>";   
       
   }
@@ -286,7 +291,7 @@ if ($result->num_rows > 0) {
     echo(formatoMoneda($row['SUM(`monto_compra`)']));
     echo"</td>";  
      echo "<td>";
-     echo(comisiones($row['SUM(`monto_compra`)']));
+     echo(comisiones($row['SUM(`monto_compra`)'], get_current_user_id()));
     echo"</td>";   
     echo"</tr>";
       }
@@ -603,6 +608,7 @@ if ($result4->num_rows > 0) {
 }  
 //_-------------------consulta a db FIN------------------------------------------------------------------------------     
  ?>
+<!--
   <script> 
 var ctx2 = document.getElementById('myChart2').getContext('2d');
  
@@ -642,6 +648,8 @@ type: 'polarArea',
 });
 
 </script>
+
+-->
 </div>
  </div>
 <?php

@@ -29,8 +29,9 @@ return "$". formatMoney( $cual, $frac);
    // return $cual;
 }
 
-function comisiones($cuanto){
+function comisiones($cuanto, $quien){
   $cuanto = floatval($cuanto);
+  /*
   if($cuanto < 30000){
       return formatoMoneda(0,true);
   }else if($cuanto >= 30000 && $cuanto < 45000){
@@ -40,5 +41,15 @@ function comisiones($cuanto){
       return formatoMoneda($cuanto*.3,true);
   }else if($cuanto >= 60000){
       return formatoMoneda($cuanto*.6,true);
+  }*/
+
+
+  if(null!==get_user_meta($quien,"esquemaValor", true)){
+  $cuanto = $cuanto * floatval(get_user_meta($quien,"esquemaValor", true))*.01;
+  }else{
+      update_user_meta( $quien,"esquemaValor", 20);  
+      $cuanto = $cuanto * get_user_meta($quien,"esquemaValor", true)*.01;
   }
+ 
+  return formatoMoneda($cuanto,true);
 }

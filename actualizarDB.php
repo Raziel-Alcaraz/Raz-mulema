@@ -69,7 +69,7 @@ $cat_slug = get_term( $cat_id )->name;
     
 }else{
   
-    $siquel = "CREATE TABLE `basedeprueba`.`wp_mul_hipercubo` ( `order_item_id` INT NOT NULL , `id_lider` VARCHAR(30) , `id_embajador`  VARCHAR(30) , `id_cliente` VARCHAR(30) , `id_compra` INT NOT NULL , `id_categoria` INT NOT NULL ,`slug_categoria` VARCHAR(30) , `monto_compra` INT NOT NULL , `porcentaje_lider` INT NOT NULL , `porcentaje_embajador` INT NOT NULL ,`num_articulos` INT NOT NULL ,`ye` INT NOT NULL ,`mo` INT NOT NULL , `datetime` VARCHAR(30) NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`order_item_id`)) ENGINE = InnoDB; ";
+    $siquel = "CREATE TABLE  `".$base."`.`wp_mul_hipercubo` ( `order_item_id` INT NOT NULL , `id_lider` VARCHAR(30) , `id_embajador`  VARCHAR(30) , `id_cliente` VARCHAR(30) , `id_compra` INT NOT NULL , `id_categoria` INT NOT NULL ,`slug_categoria` VARCHAR(30) , `monto_compra` INT NOT NULL , `porcentaje_lider` INT NOT NULL , `porcentaje_embajador` INT NOT NULL ,`num_articulos` INT NOT NULL ,`ye` INT NOT NULL ,`mo` INT NOT NULL , `datetime` VARCHAR(30) NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`order_item_id`)) ENGINE = InnoDB; ";
 $result = $conn->query($siquel);
 if($result){
  //var_dump($result);
