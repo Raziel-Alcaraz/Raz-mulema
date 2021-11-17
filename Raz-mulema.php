@@ -3,7 +3,7 @@
  * Plugin Name:       Mulema
  * Plugin URI:        https://miticher.com
  * Description:       Multi level marketing con woocommerce.
- * Version:           0.0.1
+ * Version:           1.0
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            Raziel Alcaraz

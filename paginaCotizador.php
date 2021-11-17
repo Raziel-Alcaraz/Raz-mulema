@@ -18,9 +18,10 @@ $lain = array();
 <div class="fondoCotizador">
     <h3 class="centrar">Cotizador</h3>
     <br>
-    <?php 
-    $id = 17;
-    $XXproducto = wc_get_product( $id );
+	   <?php 
+           /*
+    $id = 3298;
+       $XXproducto = wc_get_product( $id );
     $objetoGE = array();
     $objetoGE["name"] = $XXproducto->get_name();
  $objetoGE["id"] = $XXproducto->get_id();
@@ -32,23 +33,23 @@ $lain = array();
  $objetoGE["dimensions"] = $XXproducto->get_dimensions();
  $objetoGE["is_downloadable"] = $XXproducto->get_downloadable();
  //$objetoGE["download_path"] = $XXproducto->get_file_download_path();
+  $objetoGE["thumbnail"] = stripcslashes(wp_get_attachment_image_src( $XXproducto->get_image_id())[0]) ;
   $objetoGE["sku"] = $XXproducto->get_sku();
-  $objetoGE["thumbnail"] = wp_get_attachment_image_src( $XXproducto->get_image_id()) ;
   //$objetoGE["download_path"] = $XXproducto->get_file_download_path();
   $objetoImagenes = $XXproducto->get_gallery_image_ids();
   $i=0;
   $objetoImgSerial = array();
   foreach ($objetoImagenes as $value) {
-   $objetoImgSerial->$i = wp_get_attachment_image_src( $value );
+   $objetoImgSerial[$i] = stripcslashes(wp_get_attachment_image_src( $value )[0]);
     
 }
-//$objetoImgSerial2 = json_encode($objetoImgSerial);
-   $objetoGE["images"] = $objetoImgSerial;
-    
- 
-    echo json_encode($objetoGE, JSON_UNESCAPED_UNICODE);
+$objetoImgSerial2 = json_encode($objetoImgSerial, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+   $objetoGE["images"] = $objetoImgSerial2;
+    */
+// var_dump($objetoGE);
+//	echo "<br>";echo "<br>";
+  //   echo json_encode($objetoGE, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
     ?>
-    <br>
      <label class="centrar2">Categoría</label>
     <select  class="centrar2" name="cat" onChange="cambiarCat()" id="catMulema">
      <?php

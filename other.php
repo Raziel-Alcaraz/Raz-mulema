@@ -336,3 +336,12 @@ display:none;
 .xaidis{
 display:none;
 }
+#cotizacionMulema{
+overflow-x: scroll;
+max-width: 95vw;
+table-layout: fixed;
+display: block;
+}
+col{
+max-width: 16vw;
+}
