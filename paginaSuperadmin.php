@@ -551,7 +551,13 @@ type: 'polarArea',
             <br><br>
     </form>
 </div> 
-        
+<div id="mulema-sap" class="centrar">
+ <?php 
+ 
+ include("exportarSAP.php");
+ 
+ ?>
+</div>
 </div>
  </div>
 <?php
