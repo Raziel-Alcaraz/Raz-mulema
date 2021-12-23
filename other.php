@@ -287,6 +287,12 @@
 .centrar{
     text-align: center;
 }
+.centrarEnter{
+font-weigh: bolder;
+    text-align: center;
+    display:block;
+    margin:auto;
+}
 canvas{
     margin: 20px auto;
 }

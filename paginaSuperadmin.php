@@ -553,10 +553,18 @@ type: 'polarArea',
 </div> 
 <div id="mulema-sap" class="centrar">
  <?php 
- 
- include("exportarSAP.php");
- 
- ?>
+ echo $_SERVER['HTTP_USER_AGENT'] . "--------------\n\n";
+
+$browser = get_browser(null, true);
+print_r($browser);
+if((strpos($_SERVER['HTTP_USER_AGENT'],"iPhone")!=false || strpos($_SERVER['HTTP_USER_AGENT'],"iPad")!=false)
+        && strpos($_SERVER['HTTP_USER_AGENT'],"Safari")==false){
+    echo "<b>NO MOSTRAR</b>";
+
+}
+   
+custom_pre_get_posts_query( );
+              ?>
 </div>
 </div>
  </div>

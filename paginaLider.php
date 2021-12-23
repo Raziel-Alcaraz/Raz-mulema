@@ -208,7 +208,7 @@ if ($result->num_rows > 0) {
     echo(formatoMoneda($row['SUM(`monto_compra`)']));
     echo"</td>";  
      echo "<td>";
-     echo(comisiones($row['SUM(`monto_compra`)'], get_current_user_id()));
+     echo(comisiones($row['SUM(`monto_compra`)'],$aidi));
     echo"</td>";  
      echo "<td>";
      echo ""

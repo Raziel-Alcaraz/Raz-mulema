@@ -4,7 +4,7 @@ function actualizarDB(){
     include_once("conn.php");
 if ( $conn->query( "DESCRIBE `wp_mul_hipercubo`" ) ) {
     // my_table exists
-    //echo "hipercubo existe";
+    echo "hipercubo existe";
     $siquel = "SELECT * FROM `wp_wc_order_product_lookup` INNER JOIN `wp_wc_customer_lookup` "
             . "ON `wp_wc_order_product_lookup`.customer_id=`wp_wc_customer_lookup`.customer_id;";
 //echo "<br>".$siquel."<br>";
@@ -48,7 +48,7 @@ $cat_slug = get_term( $cat_id )->name;
            ,$porcentaje_embajador,$num_articulos,$ye,$mo,$datetime);*/
     $resultado2 = $conn->query($sql2);
     if($resultado2){
- echo "<br>-------------------------Resultado: ";
+ //echo "<br>-------------------------Resultado: ";
       //  var_dump($resultado2);
     }ELSE{
   //echo "<br>-------------------------NO Resultado: ";
@@ -69,10 +69,12 @@ $cat_slug = get_term( $cat_id )->name;
     
 }else{
   
-    $siquel = "CREATE TABLE  `".$base."`.`wp_mul_hipercubo` ( `order_item_id` INT NOT NULL , `id_lider` VARCHAR(30) , `id_embajador`  VARCHAR(30) , `id_cliente` VARCHAR(30) , `id_compra` INT NOT NULL , `id_categoria` INT NOT NULL ,`slug_categoria` VARCHAR(30) , `monto_compra` INT NOT NULL , `porcentaje_lider` INT NOT NULL , `porcentaje_embajador` INT NOT NULL ,`num_articulos` INT NOT NULL ,`ye` INT NOT NULL ,`mo` INT NOT NULL , `datetime` VARCHAR(30) NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`order_item_id`)) ENGINE = InnoDB; ";
+    $siquel = "CREATE TABLE  `".$base."`.`wp_mul_hipercubo` ( `order_item_id` INT NOT NULL , `id_lider` VARCHAR(30) , `id_embajador`  VARCHAR(30) , `id_cliente` VARCHAR(30) , `id_compra` INT NOT NULL , `id_categoria` INT NOT NULL ,`slug_categoria` VARCHAR(30) , `monto_compra` INT NOT NULL , `porcentaje_lider` INT NOT NULL , `porcentaje_embajador` INT NOT NULL ,`num_articulos` INT NOT NULL ,`ye` INT NOT NULL ,`mo` INT NOT NULL , `datetime` VARCHAR(30) DEFAULT NULL , PRIMARY KEY (`order_item_id`)) ENGINE = InnoDB; ";
 $result = $conn->query($siquel);
+echo $siquel ."<br><br>";
+die($siquel);
 if($result){
- //var_dump($result);
+ var_dump($result);
 }else{
    //echo"<br><br>NO RESULT__________-------------------";
 }
