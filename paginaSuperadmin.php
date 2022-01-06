@@ -2,13 +2,17 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <style>
 <?php
-include_once('other.php');
+include('other.php');
+
+?>
+</style>
+<?php
 $vtasHoy=0;
 $vtasMes = 0;
 $vtasAnio = 0;
 include_once("formatoMoneda.php");
+
 ?>
-</style>
 <div id="mulema-caratula">
      <script>
 $('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });   
@@ -148,7 +152,15 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
                  <span class="stretch"></span>
             </div>
         </div>
-        <div class="centrar" id="mulemaListas">
+        
+<div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'mulema-graficas')">Gráficas</button>
+  <button class="tablinks" onclick="openCity(event, 'mulemaListas1')">Líderes</button>
+  <button class="tablinks" onclick="openCity(event, 'mulemaListas2')">Red</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-agregar')">Agregar</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-pricing')">Pricing</button>
+</div>
+<div class="centrar tabcontent" id="mulemaListas1">
             
            
             
@@ -243,7 +255,7 @@ if ($result->num_rows > 0) {
             <td colspan="3"><form method="post">
                     <input type="text" name="generarceseve"  value="lidTop"   hidden>
                     
-                    <button class="bajarCSV" type="submit">Descargar resumen</button>
+               <!--<button class="bajarCSV" type="submit">Descargar resumen</button>-->
             
             
             </form></td>
@@ -251,14 +263,16 @@ if ($result->num_rows > 0) {
         </tr>
     </tbody>
 </table>
+</div>
+<div class="centrar tabcontent" id="mulemaListas2">        
             <?php
  include("scriptablas.html");
- 
+ include_once("pricing.php");
  ?>
         <table  class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="6">Nuevas incorporaciones</th>
+            <th class="centrar" colspan="6">Red Vive Elite</th>
             
         </tr>
         <tr>
@@ -266,7 +280,8 @@ if ($result->num_rows > 0) {
             <th onclick="sortTable(0,'mul-Nvos')">Nombre</th>
             <th onclick="sortTable(1,'mul-Nvos')">Tiempo</th>
             <th onclick="sortTable(2,'mul-Nvos')">Rol</th>
-        <!--    <th onclick="sortTable(4,'mul-Nvos')">Lider</th> -->
+            <th onclick="sortTable(3,'mul-Nvos')">Lider</th>
+        <th onclick="sortTable(4,'mul-Nvos')">Esquema</th>
         <!--    <th onclick="sortTable(5,'mul-Nvos')">Embajador</th> -->
         </tr>
     </thead>
@@ -292,7 +307,7 @@ if ($member_arr) {
        update_user_meta($aidi,"IngresoMeta",time());
    }
    if(null !== $usuario->first_name && "" !== $usuario->first_name){
-      echo '<tr '.$clase.'>';
+      echo '<tr '.$clase."><form method='POST'>";
     //  echo '<td>'.$aidi.'</td>';
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
           if(((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600)<1){
@@ -305,9 +320,42 @@ if ($member_arr) {
           echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600*24)).' días</td>';   
           }
           echo '<td>'.get_user_meta($aidi,"Cargo", true).'</td>';
-        //  echo '<td>'.get_user_meta($aidi,"Lider", true).'</td>';
+          $user =get_user_by("ID",get_user_meta($aidi,"Lider", true));
+          if($user == null){
+          echo '<td>N/A</td>';    
+          }else{
+          echo '<td>'.$user->first_name . ' ' . $user->last_name.'</td>';
+          }
+          echo "<td>";
+     echo ""
+     . '<input name="esquemaMul" value="si" hidden/>'
+             . '<input name="username" value="'.$aidi.'" hidden/>'
+             . '<select name="esquema" onchange="cambioEsquema('.$aidi.')">
+                <option value="C"';
+             if(mul_get_scheme($aidi)=="C"){
+                 echo "selected";
+             }
+             echo '>Tipo C</option>'.
+                '<option value="B"';
+              if(mul_get_scheme($aidi)=="B"){
+                 echo "selected";
+             }
+             echo'>Tipo B</option>'.
+                '<option value="A"';
+              if(mul_get_scheme($aidi)=="A"){
+                 echo "selected";
+             }
+             echo'>Tipo A</option>'.
+                '<option value="N"';
+              if(mul_get_scheme($aidi)!="A" && mul_get_scheme($aidi)!="B" &&mul_get_scheme($aidi)!="C"){
+                 echo " selected";
+             }
+             echo' disabled>Seleccione</option>'.
+            '</select>'
+             . "<button type='submit' id='botonCambioEsquema-". $aidi."' hidden>Cambiar</button>";
+    echo"</td>";
         //  echo '<td>'.get_user_meta($aidi,"Embajador", true).'</td>';
-        echo    '</tr>';
+        echo    '</form></tr>';
          if($clase == 'class="active-row"'){
      $clase = "";
    }else if($clase == ""){
@@ -330,7 +378,7 @@ if ($member_arr) {
             <td colspan="6"><form method="post">
                     <input type="text" name="generarceseve" value="nvasInc"   hidden>
                     
-                    <button class="bajarCSV" type="submit">Descargar resumen</button>
+                  <!--<button class="bajarCSV" type="submit">Descargar resumen</button>-->
             
             
             </form></td>
@@ -341,7 +389,7 @@ if ($member_arr) {
                    
             
         </div>
-<div id="mulema-graficas">
+<div id="mulema-graficas" class="tabcontent">
 <div height="100px">
 <canvas id="myChart" style="height:40vh; width:80vw"></canvas>
 </div>
@@ -350,6 +398,29 @@ if ($member_arr) {
     <canvas height="200px" width="200px" id="myChart2" style="height:300px; width:300px;display: inline-block;"></canvas>
 </div>
 </div>
+ <script>
+     function openCity(evt, cityName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+     openCity(event, 'mulema-graficas');
+     </script>
   <?php
   
   
@@ -500,6 +571,7 @@ if ($result4->num_rows > 0) {
 //_-------------------consulta a db FIN------------------------------------------------------------------------------     
  ?>
   <script> 
+             
 var ctx2 = document.getElementById('myChart2').getContext('2d');
  
 const data2 = {
@@ -538,7 +610,7 @@ type: 'polarArea',
 });
 
 </script>
-<div id="mulema-agregar" class="centrar">
+<div id="mulema-agregar" class="centrar tabcontent">
     <form method="post">
             <h2>Agregar Líder</h2> 
             <p>Login: <br><input name="mulema_user_to_add" type="text"/></p>
@@ -551,21 +623,112 @@ type: 'polarArea',
             <br><br>
     </form>
 </div> 
+<div id="mulema-pricing" class="centrar tabcontent">
+    <h2>Pricing table</h2> 
+    <table  class="styled-table">
+    <thead>
+        <tr>
+            <th class="centrar" colspan="6">Esquemas de precios</th>
+            
+        </tr>
+        <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>% A</th>
+            <th>% B</th>
+            <th>% C</th>
+        <tr>
+    <tbody>
+    <?php
+    $args = array(
+        'post_type' => 'product',
+        'posts_per_page' => -1
+    );
+    $loop = new WP_Query( $args );
+    if ( $loop->have_posts() ): while ( $loop->have_posts() ): $loop->the_post();
+
+        global $product;
+
+        $price = $product->get_price_html();
+        $sku = $product->get_sku();
+        $stock = $product->get_stock_quantity();
+echo "<tr>";
+echo "<td>".$product->get_id()."</td>";
+echo "<td>".$product->get_name()."</td>";
+
+include("conn.php");
+$sql = "SELECT * FROM `wp_mul_pricing` where id_prod=".$product->get_id().";";
+//echo "<br>".$sql."<br>";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+   echo"<form method='POST'>"
+ . '<input name="pricingMul" value="si" hidden>'
+             . '<input name="itemId" value="'.$product->get_id().'" hidden/>'
+             . '<td><input type="number" name="esquemaA" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeA'].'"></td>'
+           . '<td><input type="number" name="esquemaB" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeB'].'"></td>'
+           . '<td><input type="number" name="esquemaC" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeC'].'"></td>'
+           ;
+                
+            
+  }
+  }else{
+  
+      echo"<form method='POST'>"
+ . '<input name="pricingMul" value="si" hidden>'
+             . '<input name="itemId" value="'.$product->get_id().'" hidden/>'
+             . '<td><input type="number" name="esquemaA" onchange="cambioEsquema('.$product->get_id().')" value="50"></td>'
+           . '<td><input type="number" name="esquemaB" onchange="cambioEsquema('.$product->get_id().')" value="35"></td>'
+           . '<td><input type="number" name="esquemaC" onchange="cambioEsquema('.$product->get_id().')" value="20">'
+           ;
+  }
+  }else{
+  
+      echo"<form method='POST'>"
+ . '<input name="pricingMul" value="si" hidden>'
+             . '<input name="itemId" value="'.$product->get_id().'" hidden/>'
+             . '<td><input type="number" name="esquemaA" onchange="cambioEsquema('.$product->get_id().')" value="50"></td>'
+           . '<td><input type="number" name="esquemaB" onchange="cambioEsquema('.$product->get_id().')" value="35"></td>'
+           . '<td><input type="number" name="esquemaC" onchange="cambioEsquema('.$product->get_id().')" value="20">'
+           ;
+  }
+
+echo "<button type='submit' id='botonCambioEsquema-". $product->get_id()."' hidden>Cambiar</button></td>"
+        . '</form>';
+echo "</tr>";
+    endwhile; endif; wp_reset_postdata();
+?>
+    </tbody>
+    </table>
+</div>
 <div id="mulema-sap" class="centrar">
  <?php 
- echo $_SERVER['HTTP_USER_AGENT'] . "--------------\n\n";
+ //echo $_SERVER['HTTP_USER_AGENT'] . "--------------\n\n";
 
 $browser = get_browser(null, true);
-print_r($browser);
+//print_r($browser);
 if((strpos($_SERVER['HTTP_USER_AGENT'],"iPhone")!=false || strpos($_SERVER['HTTP_USER_AGENT'],"iPad")!=false)
         && strpos($_SERVER['HTTP_USER_AGENT'],"Safari")==false){
-    echo "<b>NO MOSTRAR</b>";
+  //  echo "<b>NO MOSTRAR</b>";
 
 }
    
-custom_pre_get_posts_query( );
+//custom_pre_get_posts_query( );
               ?>
+    <br>
+    <br>
 </div>
 </div>
  </div>
+<script>
+function cambioEsquema(cual){
+$("#botonCambioEsquema-"+cual).show();
+
+console.log($("#botonCambioEsquema-"+cual));
+
+}
+ 
+</script>
 <?php

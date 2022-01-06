@@ -6,10 +6,8 @@ include_once('other.php');
 ?>
 </style>
 <?php
-if(null ==(get_user_meta( get_current_user_id(), "esquemaValor", true ))){
-    update_user_meta( get_current_user_id(), "esquemaValor", 20);
-    update_user_meta( get_current_user_id(), "esquemaNombre", "Clase A");
-}
+$debugMULEMA="";
+
 include_once("formatoMoneda.php");
 $lain = array();
 ?>
@@ -200,16 +198,18 @@ echo "<optgroup id='".$i."'>";
      if(isset($value) && ($value)>1){
          $product = wc_get_product($value);
     if(!in_array($product->get_id(),$lain,true)){
-        echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'. $product->get_title() .'</option>';
-         $lain[$product->get_id()] = "['".$product->get_title()."',"
+        echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'. $product->get_title()."-".implode(",",$product->get_attributes()) .'</option>';
+         $lain[$product->get_id()] = "['".$product->get_title()."-".implode(",",$product->get_attributes()) ."',"
                  . "".$product->get_price()."]";
+		$debugMULEMA .="/r/n".implode(",",$product->get_attributes())."/r/n";
                }
      }
     
  }
  echo "</optgroup>";
+			
 
- }
+ }include_once("pricing.php");
 
         ?>
     </select>
@@ -233,6 +233,7 @@ echo "<optgroup id='".$i."'>";
    </div>
     <br><form method="post" id="formatoAgregar">
         <input hidden type="text" value="si" name="agregarAlPincheCarro"/>
+        <div id="contenedorCotizacion">
     <table id="cotizacionMulema"  class="styled-table">
        
   <col class="COSAS"/>
@@ -246,7 +247,7 @@ echo "<optgroup id='".$i."'>";
         <th class="COSAS">Descripción</th>
         <th class="sumaP1" >Cantidad</th>
         <th id="mul_pricename">Precio al público</th>
-        <th class="sumaP2">Descuento <?php echo get_user_meta(get_current_user_id(), "esquemaNombre", true ); ?></th>
+        <th class="sumaP2">Descuento Tipo <?php echo  mul_get_scheme(get_current_user_id()); ?></th>
         
         <th class="sumaP4">Monto a pagar</th>
         <th class="sumaP5">Utilidad</th>
@@ -256,17 +257,19 @@ echo "<optgroup id='".$i."'>";
         <tbody id="row_productos">
             
         </tbody>
-    </table></form>
+    </table></form></div>
   
                     <button id="mul_send2Cart" onclick="mandarDatos()" class="botoncentrado">Confirmar</button>
                    
     <script>
+		
       var sumaP1=0;
        var sumaP2=0;
        var xP3=0;
        var sumaP4=0;
        var sumaP5=0; 
      <?php
+     
     echo "var lain= new Map();";
    foreach ($lain as $key => $value)
       {
@@ -280,7 +283,7 @@ echo "<optgroup id='".$i."'>";
 });   
     function mul_agregar(){
         var valorvariante = document.getElementById("variationsMul").value;
-        console.log(valorvariante);
+        console.log("valorvariante"+valorvariante);
         if(valorvariante===""){
             valorvariante = null;
         }
@@ -340,15 +343,14 @@ echo "<optgroup id='".$i."'>";
               *parseInt(document.getElementById("numeroCosasMulema").value);
        
     }
-      
-      td2.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ) ?>; 
-      td4.innerText = parseFloat(td1.innerText)*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))) ?>;
-      td5.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ) ?>;
-      tdi6.value = document.getElementById("cosaMulema").value;
-      if(valorvariante !== null){
+       if(valorvariante !== null){
       tdi6.value = valorvariante;
        
     }
+      td2.innerText = parseFloat(td1.innerText)*cotizar(2,tdi6.value, td2,td1.innerText)*0.01; 
+      td4.innerText = cotizar(4,tdi6.value, td4,td1.innerText);
+      td5.innerText = parseFloat(td1.innerText)*cotizar(5,tdi6.value, td5,td1.innerText)*0.01; 
+      
       var puedeagregar = false;
       var cuantosvan =0;
       $('#cotizacionMulema').each(function(){
@@ -382,15 +384,15 @@ echo "<optgroup id='".$i."'>";
          td1.innerText = parseFloat(lain.get(valorvariante)[1])
               *parseInt(tdi3.value); 
         }
-      td2.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ); ?> ;
-      
-      td4.innerText = parseFloat(td1.innerText)*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))); ?>;
-      td5.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ); ?> ;
-      tdi6.value = document.getElementById("cosaMulema").value;
-      if(valorvariante !== null){
-         
+        tdi6.value = document.getElementById("cosaMulema").value;
+        if(valorvariante !== null){  
       tdi6.value = valorvariante;
         }
+      td2.innerText = parseFloat(td1.innerText)*cotizar(2,tdi6.value, td2,td1.innerText)*0.01; 
+      td4.innerText = cotizar(4,tdi6.value, td4,td1.innerText);
+      td5.innerText = parseFloat(td1.innerText)*cotizar(5,tdi6.value, td5,td1.innerText)*0.01; 
+      
+      
       });
       td3.append(tdi3);
       td6.append(tdi6);
@@ -480,6 +482,7 @@ echo "<optgroup id='".$i."'>";
         */
         
         }
+        /*
         function cotizarMul(num){
             var formatter = new Intl.NumberFormat('es-MX', {
   style: 'currency',
@@ -491,17 +494,20 @@ echo "<optgroup id='".$i."'>";
 });
 
 //formatter.format(2500); /* $2,500.00 */
+/*
           var valor =  document.getElementById("cosaMulema").value;
           var multiplier = document.getElementById("numeroCosasMulema").value;
           console.log(valor);
           document.getElementById("mulR1"+num).innerHTML = formatter.format((valor*multiplier));
-          document.getElementById("mulR2"+num).innerHTML = formatter.format((valor*multiplier*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))); ?>));
-          document.getElementById("mulR3"+num).innerHTML = formatter.format((valor*multiplier*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))); ?>));
-          document.getElementById("mulR4"+num).innerHTML = formatter.format((valor*multiplier*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ); ?> ));
+          document.getElementById("mulR2"+num).innerHTML = formatter.format((valor*multiplier*<?php // echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))); ?>));
+          document.getElementById("mulR3"+num).innerHTML = formatter.format((valor*multiplier*<?php // echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))); ?>));
+          document.getElementById("mulR4"+num).innerHTML = formatter.format((valor*multiplier*<?php // echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ); ?> ));
         }
         // Create our number formatter.
+        */
 function mandarDatos(){
     console.log("enviando");
+			
   $("#formatoAgregar").submit();
     
     }
@@ -514,9 +520,9 @@ function cambiarMulCant(tdi3,td1,td2,td4,td5, tdi6){
     console.log(tdi6);
     console.log(lain);
     td1.innerText = parseFloat(lain.get(tdi6.value)[1])*parseFloat(tdi3.value);
-    td2.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ) ?> ;
-    td4.innerText = parseFloat(td1.innerText)*<?php echo ".".(100-intVal(get_user_meta( get_current_user_id(), "esquemaValor", true ))) ?>;
-    td5.innerText = parseFloat(td1.innerText)*<?php echo ".".get_user_meta( get_current_user_id(), "esquemaValor", true ) ?> ;
+    td2.innerText = parseFloat(td1.innerText)*cotizar(2,tdi6.value, td2,td1.innerText)*0.01; 
+      td4.innerText = cotizar(4,tdi6.value, td4,td1.innerText);
+      td5.innerText = parseFloat(td1.innerText)*cotizar(5,tdi6.value, td5,td1.innerText)*0.01;
     
     
     sumarTodoElPedo("cero");
@@ -651,6 +657,31 @@ $('#row_productos tr').each(function(){
     }); 
      $('#variationsMul').val(null);
     }
+    function cotizar(tipo,id, element,valorOtro){
+        
+    $.post(window.location.href,{
+    producto_ID_cotiz: id
+  }, function(data, status){
+      //alert("Data: " + data + "\nStatus: " + status);
+      switch(tipo){
+          case 2:
+      element.innerText = parseFloat(valorOtro)*data*0.01;
+      break;
+  case 4:
+       element.innerText = ((100-data)*0.01)*parseFloat(valorOtro);
+      break;
+  case 5:
+      //cotizar(5,tdi6.value, td5,td1.innerText)
+      element.innerText = parseFloat(valorOtro)*data*0.01;
+  break;
+  default:
+      break;
+      }
+      sumarTodoElPedo();
+      return("...");
+    });
+  }
+    
     </script>    
 <div>
 </div>

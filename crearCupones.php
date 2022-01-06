@@ -1,12 +1,12 @@
 <?php
-function crearCupon($cuanto){
+function crearCupon($cuanto, $keys, $id){
     /**
 * Create a coupon programatically
 */
     
-$coupon_code = substr(hash('gost',strval(round(microtime(true) * 1000)),false),0,8); // Code
+$coupon_code = $id.substr(hash('gost',strval(round(microtime(true) * 1000)),false),0,8); // Code
 $amount = $cuanto;// Amount
-$discount_type = 'percent'; // Type: fixed_cart, percent, fixed_product, percent_product
+$discount_type = 'percent_product'; // Type: fixed_cart, percent, fixed_product, percent_product
 
 $coupon = array(
 'post_title' => $coupon_code,
@@ -20,8 +20,8 @@ $new_coupon_id = wp_insert_post( $coupon );
 // Add meta
 update_post_meta( $new_coupon_id, 'discount_type', $discount_type );
 update_post_meta( $new_coupon_id, 'coupon_amount', $amount );
-update_post_meta( $new_coupon_id, 'individual_use', 'yes' );
-update_post_meta( $new_coupon_id, 'product_ids', '' );
+update_post_meta( $new_coupon_id, 'individual_use', 'no' );
+update_post_meta( $new_coupon_id, 'product_ids', $keys );
 update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
 update_post_meta( $new_coupon_id, 'usage_limit', '1' );
 update_post_meta( $new_coupon_id, 'expiry_date', Date("D-m-Y H:i") );

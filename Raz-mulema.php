@@ -10,6 +10,20 @@
  * Author URI:        https://razielalcaraz.com/
  * License:           GPL v2 or later
  */
+// include custom jQuery
+function mulema_include_custom_jquery() {
+
+	wp_deregister_script('jquery');
+	wp_enqueue_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js', array(), null, true);
+
+}
+add_action('wp_enqueue_scripts', 'mulema_include_custom_jquery');
+
+
+
+
+
+
 add_action( 'init', 'mulema_process_api_get' );
 function mulema_process_api_get(){
     
@@ -40,6 +54,7 @@ function mulema_process_api_get(){
         die();
        
     }
+    
 }
 function mulema_lost_your_password ($text) {
         if ($text == '¿Olvidaste tu contraseña?'|| $text == '¿Has olvidado tu contraseña?'){
@@ -69,6 +84,12 @@ $mul_id_emb = 1;
 
 
 function process_post() {
+    if (isset($_POST["producto_ID_cotiz"])){
+        include_once("pricing.php");
+         echo mul_get_discount_percent($_POST["producto_ID_cotiz"], mul_get_scheme(get_current_user_id()));
+        die();
+        
+    }
      if( isset( $_POST['mulema_user_to_add'] ) ) {
          if($_POST['mulema_user_role'] == "Lider"){
          $cargo = "GERENTE REGIONAL";
@@ -106,17 +127,9 @@ function process_post() {
          update_user_meta( $userId, "Ingreso", date("l jS \d\e F \d\e Y h:i:s A", time()));
          update_user_meta( $userId, "IngresoMeta", time());
          update_user_meta( $userId, "Foto", "https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png");
-         if(isset( $_POST['esquemaValor'])){
-         update_user_meta( $userId, "esquemaValor", $_POST['esquemaValor']);
-          $esquemaNombre = "Clase A";
-         if( intVal($_POST['esquemaValor']== 20)){
-            $esquemaNombre = "Clase A";    
-         }else if( intVal($_POST['esquemaValor']== 35)){
-            $esquemaNombre = "Clase B";    
-         } else if( intVal($_POST['esquemaValor']== 50)){
-            $esquemaNombre = "Clase C";    
-         }
-         update_user_meta( $userId, "esquemaNombre", $esquemaNombre);
+         if(isset( $_POST['esquema'])){
+         include_once("pricing.php");
+         mul_set_scheme($userId, $_POST['esquema']);
          }
         
          
@@ -186,33 +199,62 @@ WC()->customer = new WC_Customer( get_current_user_id(), true );
 WC()->cart = new WC_Cart();
 WC()->cart->empty_cart();
          foreach($_POST as $key => $value) {
-  echo "POST parameter '$key' has '$value'<br>";
+  
   global $woocommerce;
   if($value!="si"){
- 
-WC()->cart->add_to_cart( $key, $value ); 
+      include_once("crearCupones.php");
+     include_once("pricing.php");
+ echo "POST parameter '$key' has '$value'<br>";
+WC()->cart->add_to_cart( $key, $value );
+WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
   }
-}if(true){
-    include_once("crearCupones.php");
-    
-     WC()->cart->apply_coupon( crearCupon(get_user_meta(get_current_user_id(),"esquemaValor", true)) );
-wp_safe_redirect( wc_get_checkout_url() );   }   
+}
+		 if(true){
+    //include_once("crearCupones.php");
+     //include_once("pricing.php");
+         //echo mul_get_discount_percent($_POST["producto_ID_cotiz"], mul_get_scheme(get_current_user_id()));
+     //WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
+			 
+echo "al parecer hubo un error, has click <a href='https://viveelite.com/carrito-2/'>Aquí</a>";			 
+			 
+wp_safe_redirect( wc_get_checkout_url() );   
+		 
+		 }   
      }
     else if( isset( $_POST['esquemaMul'] ) &&
             isset( $_POST['esquema'] )) {
-        
+        include_once("pricing.php");
         //cambiar esquema-------------------------------------------------------------------
-        update_user_meta( $_POST['username'], "esquemaValor", $_POST['esquema']); 
-         $esquemaNombre = "";
-         if( intVal($_POST['esquema']== 20)){
-            $esquemaNombre = "Clase A";    
-         }else if( intVal($_POST['esquema']== 35)){
-            $esquemaNombre = "Clase B";    
-         } else if( intVal($_POST['esquema']== 50)){
-            $esquemaNombre = "Clase C";    
-         }
+        mul_set_scheme($_POST['username'], $_POST['esquema']);
+     }else if( isset( $_POST['pricingMul'] ) &&
+            isset( $_POST['itemId'] )) {
+      include("conn.php");  
+        //cambiar esquema-------------------------------------------------------------------
+      
        
-     update_user_meta( $_POST['username'], "esquemaNombre",  $esquemaNombre); 
+$sql = "INSERT INTO  `wp_mul_pricing`"
+               ." (`id_prod`,`porcentajeA`, `porcentajeB`, `porcentajeC`) VALUES"
+                . "(".$_POST['itemId'].",".$_POST['esquemaA'] 
+               .", ".$_POST['esquemaB'] 
+               .", ".$_POST['esquemaC']
+               .");";
+       $result = $conn->query($sql);
+       //var_dump($sql);
+       //var_dump($result);
+    if(!$result){
+ 
+        $sql = "UPDATE  `wp_mul_pricing`"
+               ." set `porcentajeA`=".$_POST['esquemaA'] 
+               .", `porcentajeB`=".$_POST['esquemaB'] 
+               .", `porcentajeC`=".$_POST['esquemaC']
+               ." where `id_prod`=".$_POST['itemId'].";";
+
+       $result = $conn->query($sql); 
+       //var_dump($sql);
+       //var_dump($result);
+    }else{
+        
+    }
    
      }
      else{

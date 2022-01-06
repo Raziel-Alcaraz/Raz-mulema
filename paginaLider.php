@@ -40,7 +40,7 @@ if ($member_arr) {
     
   
      
-include_once("conn.php");
+include("conn.php");
 $sql = "SELECT * FROM `wp_wc_customer_lookup` where user_id=".$aidi.";";
 //echo "<br>".$sql."<br>";
 $result = $conn->query($sql);
@@ -142,7 +142,13 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
                  <span class="stretch"></span>
             </div>
         </div>
-        <div  class="centrar" id="mulemaListas">
+        <div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'mulema-graficas')">Gráficas</button>
+  <button class="tablinks" onclick="openCity(event, 'mulemaListas1')">Mi red</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-agregar')">Agregar</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-datos')">Mis datos</button>
+</div>
+        <div  class="centrar tabcontent" id="mulemaListas1">
                <?php
  include("scriptablas.html");
  
@@ -195,6 +201,7 @@ if ($member_arr) {
             
   
 include_once("conn.php");
+include_once("pricing.php");
 $sql = "SELECT SUM(`monto_compra`) FROM `wp_mul_hipercubo` where id_embajador='".$aidi."';";
 //echo "<br>".$sql."<br>";
 $result = $conn->query($sql);
@@ -214,22 +221,27 @@ if ($result->num_rows > 0) {
      echo ""
      . '<input name="esquemaMul" value="si"/ hidden>'
              . '<input name="username" value="'.$aidi.'" hidden/>'
-             . '<select name="esquema" onchange="cambioEsquema('.$aidi.')">
-                <option value="50"';
-             if(get_user_meta($aidi,"esquemaValor", true)==50){
+              .'<select name="esquema" onchange="cambioEsquema('.$aidi.')">
+                <option value="C"';
+             if(mul_get_scheme($aidi)=="C"){
                  echo "selected";
              }
-             echo '>Clase C: 50%</option>'.
-                '<option value="35"';
-              if(get_user_meta($aidi,"esquemaValor", true)==35){
+             echo '>Tipo C</option>'.
+                '<option value="B"';
+              if(mul_get_scheme($aidi)=="B"){
                  echo "selected";
              }
-             echo'>Clase B: 35%</option>'.
-                '<option value="20"';
-              if(get_user_meta($aidi,"esquemaValor", true)==20){
+             echo'>Tipo B</option>'.
+                '<option value="A"';
+              if(mul_get_scheme($aidi)=="A"){
                  echo "selected";
              }
-             echo'>Clase A: 20%</option>'.
+             echo'>Tipo A</option>'.
+                '<option value="N"';
+              if(mul_get_scheme($aidi)!="A" && mul_get_scheme($aidi)!="B" &&mul_get_scheme($aidi)!="C"){
+                 echo " selected";
+             }
+             echo' disabled>Seleccione</option>'.
             '</select>'
              . "<button type='submit' id='botonCambioEsquema-". $aidi."' hidden>Cambiar</button>";
     echo"</td>";  
@@ -263,7 +275,7 @@ if ($result->num_rows > 0) {
             <td colspan="4"><form method="post">
                     <input type="text" name="generarceseve" value="ok"   hidden>
                     
-                    <button class="bajarCSV" type="submit">Descargar resumen</button>
+                  <!--  <button class="bajarCSV" type="submit">Descargar resumen</button> -->
             
             
             </form></td>
@@ -376,7 +388,7 @@ if ($result->num_rows > 0) {
             <td colspan="3"><form method="post">
                     <input type="text" name="generarceseve" value="ok"   hidden>
                     
-                    <button class="bajarCSV" type="submit">Descargar resumen</button>
+                    <!--  <button class="bajarCSV" type="submit">Descargar resumen</button> -->
             
             
             </form></td>
@@ -386,7 +398,7 @@ if ($result->num_rows > 0) {
 </table>           
             
         </div>
-<div id="mulema-graficas">
+<div class="tabcontent" id="mulema-graficas">
 <div height="100px">
 <canvas id="myChart" style="height:40vh; width:80vw"></canvas>
 </div>
@@ -395,6 +407,29 @@ if ($result->num_rows > 0) {
     <canvas height="200px" width="200px" id="myChart2" style="height:300px; width:300px;display: inline-block;"></canvas>
 </div>
 </div>
+        <script>
+         function openCity(evt, cityName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+     openCity(event, 'mulema-graficas');
+     </script>
   <?php
   
   
@@ -589,7 +624,7 @@ console.log($("#botonCambioEsquema-"+cual));
 
 }
 </script>
-<div id="mulema-agregar" class="centrar">
+<div id="mulema-agregar" class="centrar tabcontent">
     <form method="post">
             <h2>Agregar embajador</h2> 
             <p> Login: <br><input name="mulema_user_to_add" type="text"/></p>
@@ -598,9 +633,9 @@ console.log($("#botonCambioEsquema-"+cual));
             <p>Nombre: <br><input name="first_name" type="text"/></p>
             <p>Apellido: <br><input name="last_name" type="text"/></p>
             Esquema: <br><select name="esquema">
-                <option value="50">Clase C: 50%</option>
-                <option value="35">Clase B: 35%</option>
-                <option value="20">Clase A: 20%</option>
+                <option value="C">Tipo C</option>
+                <option value="B">Tipo B</option>
+                <option value="A">Tipo A</option>
             </select>
             <br>
             <input hidden name="mulema_user_role" value="Embajador"/>
@@ -610,7 +645,7 @@ console.log($("#botonCambioEsquema-"+cual));
 </div> 
         
         
-          <div id="mulema-datos" class="centrar">
+          <div id="mulema-datos" class="centrar tabcontent">
             <h2> Mis datos  </h2> 
             <hr/>
             <h4>Cuenta bancaria:</h4>
@@ -655,17 +690,7 @@ console.log($("#botonCambioEsquema-"+cual));
              <div class="centrar"><button class="mul-botonCobrar" type="submit">Cambiar</button></div>
              </form>
             <hr/>
-            <h4>Información de mi red</h4>
-            <p> Nominado por: <?php
-            $nominador_mul = get_user_meta( get_current_user_id(), "Nominador", true );
-            $nominador_mul_texto = get_user_by('id',$nominador_mul);
-             echo $nominador_mul_texto->first_name." ".$nominador_mul_texto->last_name; ?></p><br>
-            <p> Registro en la plataforma: <?php
-            $fecha_mul = get_user_meta( get_current_user_id(), "Ingreso", true );
-           
-             echo $fecha_mul; ?></p> </p>
-            <p></p>
-            <br><br>.<br>
+          
         </div>
 </div>
  </div>

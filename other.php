@@ -336,18 +336,66 @@ text-align: left;
 }
 .aidis{
 display:none;
+
 }.aidisT{
 display:none;
+
 }
 .xaidis{
 display:none;
 }
-#cotizacionMulema{
-overflow-x: scroll;
+#cotizacionMulema input{
+width: 80px;
+}
+#contenedorCotizacion{
+width: 85vw;
 max-width: 95vw;
-table-layout: fixed;
 display: block;
+margin: auto;
+overflow-x: scroll;
 }
 col{
 max-width: 16vw;
 }
+#footer-thankyou{
+display: none !important;
+
+}
+ /* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  display: block;
+  margin: auto;
+  width: 75%;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+} 

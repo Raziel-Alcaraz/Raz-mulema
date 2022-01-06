@@ -81,4 +81,50 @@ if($result){
 
   
 }
+actualizarDBPricing();
+}
+function actualizarDBPricing(){
+    include("conn.php");
+if ( $conn->query( "DESCRIBE `wp_mul_pricing`" ) ) {
+    // my_table exists
+  //  echo "pricing existe";
+  
+    
+}else{
+  
+    $siquel = "CREATE TABLE  `".$base."`.`wp_mul_pricing` ( `id_prod` INT NOT NULL , `porcentajeA` DECIMAL , `porcentajeB` DECIMAL , `porcentajeC` DECIMAL , PRIMARY KEY (`id_prod`)) ENGINE = InnoDB; ";
+$result = $conn->query($siquel);
+echo $siquel ."<br><br>";
+die($siquel);
+if($result){
+ var_dump($result);
+}else{
+   //echo"<br><br>NO RESULT__________-------------------";
+}
+
+  
+}
+actualizarDBPriceSchemes();
+}
+function actualizarDBPriceSchemes(){
+    include("conn.php");
+if ( $conn->query( "DESCRIBE `wp_mul_schemes`" ) ) {
+    // my_table exists
+  //  echo "pricing existe";
+  
+    
+}else{
+  
+    $siquel = "CREATE TABLE  `".$base."`.`wp_mul_schemes` ( `id_usr` INT NOT NULL ,  `nombreesquema` VARCHAR(30) , PRIMARY KEY (`id_usr`)) ENGINE = InnoDB; ";
+$result = $conn->query($siquel);
+echo $siquel ."<br><br>";
+die($siquel);
+if($result){
+ var_dump($result);
+}else{
+    var_dump($siquel);
+   echo"<br><br>NO RESULT__________-------------------";
+}
+ 
+}
 }
