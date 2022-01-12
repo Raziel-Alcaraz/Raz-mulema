@@ -4,7 +4,7 @@ function crearCupon($cuanto, $keys, $id){
 * Create a coupon programatically
 */
     
-$coupon_code = $id.substr(hash('gost',strval(round(microtime(true) * 1000)),false),0,8); // Code
+$coupon_code = $id."-".$keys."-".substr(hash('gost',strval(round(microtime(true) * 1000)),false),0,8); // Code
 $amount = $cuanto;// Amount
 $discount_type = 'percent_product'; // Type: fixed_cart, percent, fixed_product, percent_product
 

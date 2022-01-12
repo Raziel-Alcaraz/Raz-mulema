@@ -11,6 +11,40 @@
  * License:           GPL v2 or later
  */
 // include custom jQuery
+$mul_coupons_added = false;
+add_action( 'woocommerce_before_calculate_totals', 'mul_auto_add_coupons' );
+function mul_auto_add_coupons( $cart_object ) {
+    if ( did_action( 'woocommerce_before_calculate_totals' ) > 2 ){
+        return;
+    }
+  
+    //var_dump(WC()->cart->get_cart());
+     foreach ( WC()->cart->get_cart() as $cart_item ) {
+     $vale=true;
+         
+         //echo "--------------------PROD:";
+         //var_dump( $cart_item);
+    $key= $cart_item['product_id'];
+    //echo "--------------------IDPROD:". $key;
+        foreach (WC()->cart->get_applied_coupons() as $coupon) {
+    if(str_contains($coupon, "-".$key."-")) {
+       $vale = false; 
+    }
+   } 
+   if(count(WC()->cart->get_applied_coupons())<1){
+     $vale=true; 
+     var_dump(WC()->cart->get_applied_coupons());
+   }
+   if($vale==true){
+       echo "--------------------IDPROD:". $key;
+  var_dump($coupon);
+  var_dump(WC()->cart->get_applied_coupons());
+ include_once("pricing.php");
+         include_once("crearCupones.php");
+       WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
+   }
+    }
+}
 function mulema_include_custom_jquery() {
 
 	wp_deregister_script('jquery');
