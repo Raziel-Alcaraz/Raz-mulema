@@ -36,9 +36,9 @@ function mul_auto_add_coupons( $cart_object ) {
      var_dump(WC()->cart->get_applied_coupons());
    }
    if($vale==true){
-       echo "--------------------IDPROD:". $key;
-  var_dump($coupon);
-  var_dump(WC()->cart->get_applied_coupons());
+       //echo "--------------------IDPROD:". $key;
+  //var_dump($coupon);
+  //var_dump(WC()->cart->get_applied_coupons());
  include_once("pricing.php");
          include_once("crearCupones.php");
        WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
@@ -226,6 +226,7 @@ function process_post() {
          actualizarDB();
      }else if ( isset( $_POST['agregarAlPincheCarro'] ) ){
         // die(strval(intval(Date("j")+1)). Date(" F, Y"));
+         
         wc()->frontend_includes();
               WC()->session = new WC_Session_Handler();
 WC()->session->init();
@@ -235,12 +236,13 @@ WC()->cart->empty_cart();
          foreach($_POST as $key => $value) {
   
   global $woocommerce;
+  
   if($value!="si"){
       include_once("crearCupones.php");
      include_once("pricing.php");
  echo "POST parameter '$key' has '$value'<br>";
 WC()->cart->add_to_cart( $key, $value );
-WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
+//WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
   }
 }
 		 if(true){
@@ -248,10 +250,10 @@ WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_sche
      //include_once("pricing.php");
          //echo mul_get_discount_percent($_POST["producto_ID_cotiz"], mul_get_scheme(get_current_user_id()));
      //WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
-			 
+			
 echo "al parecer hubo un error, has click <a href='https://viveelite.com/carrito-2/'>Aquí</a>";			 
 			 
-wp_safe_redirect( wc_get_checkout_url() );   
+wp_safe_redirect( wc_get_cart_url() );   
 		 
 		 }   
      }
