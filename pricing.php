@@ -2,7 +2,7 @@
 
 function mul_get_discount_percent($id_prod, $tipo){
     include("conn.php");
-    $retorno = "";
+    $retorno = "20";
    $sql = "SELECT `porcentaje".$tipo."` FROM `wp_mul_pricing` WHERE `id_prod` ==".$id_prod.";";
 $result = $conn->query($sql);
 if($result){
@@ -62,7 +62,7 @@ $result = $conn->query($sql);
 if ($result) {
     echo"Cambiado el esquema";
 }else{
-    var_dump($sql);
+    //var_dump($sql);
     die();
 }
 }
@@ -70,7 +70,7 @@ if ($result) {
 }
 function mul_get_scheme($id_usr){
   include("conn.php");
-    $retorno = "";
+    $retorno = "A";
    $sql = "SELECT `nombreesquema` FROM `wp_mul_schemes` WHERE `id_usr` =".$id_usr.";";
 $result = $conn->query($sql);
 if($result){
@@ -85,7 +85,7 @@ if ($result->num_rows > 0) {
   return "N/A";
 }
 } else {
-  var_dump($sql);  
+  //var_dump($sql);  
   return "N/A";
 }
 

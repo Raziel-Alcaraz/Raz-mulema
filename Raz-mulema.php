@@ -17,7 +17,7 @@ function mul_auto_add_coupons( $cart_object ) {
     if ( did_action( 'woocommerce_before_calculate_totals' ) > 2 ){
         return;
     }
-  
+  WC()->cart->remove_coupons();
     //var_dump(WC()->cart->get_cart());
      foreach ( WC()->cart->get_cart() as $cart_item ) {
      $vale=true;
@@ -26,22 +26,40 @@ function mul_auto_add_coupons( $cart_object ) {
          //var_dump( $cart_item);
     $key= $cart_item['product_id'];
     //echo "--------------------IDPROD:". $key;
+    if(WC()->cart->get_applied_coupons()){
+    if(WC()->cart->get_applied_coupons()<1){
+     $vale=true; 
+    
+   }else{
+        var_dump(WC()->cart->get_applied_coupons());
         foreach (WC()->cart->get_applied_coupons() as $coupon) {
     if(str_contains($coupon, "-".$key."-")) {
        $vale = false; 
     }
-   } 
-   if(count(WC()->cart->get_applied_coupons())<1){
-     $vale=true; 
-     var_dump(WC()->cart->get_applied_coupons());
    }
+   }
+	}else{
+		$vale = true;
+	}
+   
    if($vale==true){
        //echo "--------------------IDPROD:". $key;
   //var_dump($coupon);
   //var_dump(WC()->cart->get_applied_coupons());
  include_once("pricing.php");
          include_once("crearCupones.php");
-       WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
+	   $esquema_usuario = mul_get_scheme(get_current_user_id());
+	   //echo "<br>0---";
+	   //var_dump($esquema_usuario);
+	   $porcentaje_usuario = mul_get_discount_percent($key, $esquema_usuario);
+	   //echo "<br>1---";
+	   //var_dump($porcentaje_usuario);
+	   
+	   $cupon_creado = crearCupon($porcentaje_usuario,$key, get_current_user_id());
+	   //echo "<br>2---";
+	   //var_dump($cupon_creado);
+	   //echo "<br>3---";
+       WC()->cart->apply_coupon( $cupon_creado );
    }
     }
 }
@@ -227,7 +245,7 @@ function process_post() {
      }else if ( isset( $_POST['agregarAlPincheCarro'] ) ){
         // die(strval(intval(Date("j")+1)). Date(" F, Y"));
          
-        wc()->frontend_includes();
+        WC()->frontend_includes();
               WC()->session = new WC_Session_Handler();
 WC()->session->init();
 WC()->customer = new WC_Customer( get_current_user_id(), true );
@@ -240,7 +258,7 @@ WC()->cart->empty_cart();
   if($value!="si"){
       include_once("crearCupones.php");
      include_once("pricing.php");
- echo "POST parameter '$key' has '$value'<br>";
+ //echo "POST parameter '$key' has '$value'<br>";
 WC()->cart->add_to_cart( $key, $value );
 //WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
   }
