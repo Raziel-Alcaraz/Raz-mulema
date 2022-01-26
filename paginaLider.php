@@ -675,10 +675,14 @@ console.log($("#botonCambioEsquema-"+cual));
             <p> <select name="mulema_update_region"  value="<?php
             $reg_mul = get_user_meta( get_current_user_id(), "Region", true );
             echo $reg_mul; ?>">
-    <option value="CDMX" <?php if($reg_mul == "CDMX"){ echo "selected='selected'"; }?>>CDMX</option>
-    <option value="MEX" <?php if($reg_mul == "MEX"){ echo "selected='selected'"; }?>>Estado de México</option>
-    <option value="MICH" <?php if($reg_mul == "MICH"){ echo "selected='selected'"; }?>>Michoacán</option>
-    <option value="VER" <?php if($reg_mul == "VER"){ echo "selected='selected'"; }?>>Veracruz</option>
+    <option value="Noreste" <?php if($reg_mul == "Noreste"){ echo "selected='selected'"; }?>>Noreste</option>
+    <option value="Noroeste" <?php if($reg_mul == "Noroeste"){ echo "selected='selected'"; }?>>Noroeste</option>
+    <option value="Occidente" <?php if($reg_mul == "Occidente"){ echo "selected='selected'"; }?>>Occidente</option>
+    <option value="Oriente" <?php if($reg_mul == "Oriente"){ echo "selected='selected'"; }?>>Oriente</option>
+    <option value="Centronorte" <?php if($reg_mul == "Centronorte"){ echo "selected='selected'"; }?>>Centronorte</option>
+    <option value="Centrosur" <?php if($reg_mul == "Centrosur"){ echo "selected='selected'"; }?>>Centrosur</option>
+    <option value="Sureste" <?php if($reg_mul == "Sureste"){ echo "selected='selected'"; }?>>Sureste</option>
+    <option value="Suroeste" <?php if($reg_mul == "Suroeste"){ echo "selected='selected'"; }?>>Suroeste</option>
   </select>
             
             
@@ -728,7 +732,7 @@ echo iconv('ISO-8859-2', 'UTF-8', strftime("%a %d %b %Y, %I:%M %p", strtotime($r
 echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$row4['id_embajador'].",".$row4['id_cliente'].");'>Ver</button></td></tr>";
   }
   }else{
-      echo "<tr> <td colspan='6'>Aún no se han registrado ventas, ¡Genera algunas ahora mismo!".get_current_user_id()."</td></tr>";
+      echo "<tr> <td colspan='6'>Aún no se han registrado ventas, ¡Genera algunas ahora mismo!</td></tr>";
   }
 }else{
       echo $sql4;

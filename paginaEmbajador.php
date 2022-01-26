@@ -154,6 +154,15 @@ echo $current_user->user_firstname;
  include("scriptablas.html");
  
  ?>
+             <div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'mulema-graficas')">Gráficas</button>
+  <button class="tablinks" onclick="openCity(event, 'mulemaListas1')">Clientes TOP</button>
+  <button class="tablinks" onclick="openCity(event, 'mulemaListas2')">Categorías TOP</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-agregar')">Agregar</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-datos')">Mis datos</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-compras')">Compras de Red</button>
+</div>
+            <div class="tabcontent" id="mulemaListas1">
             <table class="styled-table">
     <thead>
         <tr>
@@ -240,19 +249,11 @@ if ($result->num_rows > 0) {
         
         
         ?>
-        <tr>
-            <td colspan="3"><form method="post">
-                    <input type="text" name="generarceseve" value="ok"   hidden>
-                    
-                    <button class="bajarCSV" type="submit">Descargar resumen</button>
-            
-            
-            </form></td>
         
-        </tr>
     </tbody>
 </table>
-
+            </div>
+       <div class="tabcontent" id="mulemaListas2">     
         <table class="styled-table">
     <thead>
         <tr>
@@ -296,27 +297,26 @@ if ($result->num_rows > 0) {
     echo"</tr>";
       }
   }
-  }
-  }
+  }else {
+  echo '<tr class="active-row">
+            <td colspan="3">No se han encontrado usuarios</td>
+        </tr>';
+}
+  }else {
+  echo '<tr class="active-row">
+            <td colspan="3">No se han encontrado usuarios</td>
+        </tr>';
+}
   } 
 //_-------------------consulta a db FIN------------------------------------------------------------------------------   
        
        ?>
-       <tr>
-            <td colspan="3"><form method="post">
-                    <input type="text" name="generarceseve" value="ok"   hidden>
-                    
-                    <button class="bajarCSV" type="submit">Descargar resumen</button>
-            
-            
-            </form></td>
-        
-        </tr>
+      
     </tbody>
 </table>           
             
         </div>
-<div id="mulema-graficas">
+<div class="tabcontent" id="mulema-graficas">
 <div height="100px">
 <canvas id="myChart" style="height:40vh; width:80vw"></canvas>
 </div>
@@ -451,7 +451,29 @@ const actions = [
   },
 ];
 var myChart = new Chart(ctx, config);
+function openCity(evt, cityName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
 
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(cityName).style.display = "block";
+  if(evt!=null){
+  evt.currentTarget.className += " active";
+  }
+}
+     openCity(null, 'mulema-graficas');
 //-----------------------------------
  //----------consulta a db inicio------------------------------------------------------------------------------
   </script>          
@@ -513,7 +535,7 @@ type: 'polarArea',
 });
 
 </script>
-<div id="mulema-agregar" class="centrar">
+<div id="mulema-agregar" class="centrar tabcontent">
     <form method="post">
             <h2>Agregar cliente</h2> 
             <p> Login: <br><input name="mulema_user_to_add" type="text"/></p>
@@ -528,7 +550,7 @@ type: 'polarArea',
 </div> 
         
         
-          <div id="mulema-datos" class="centrar">
+          <div id="mulema-datos" class="centrar tabcontent">
             <h2> Mis datos  </h2> 
             <hr/>
             <h4>Cuenta bancaria:</h4>
@@ -562,10 +584,14 @@ type: 'polarArea',
             <p> <select name="mulema_update_region"  value="<?php
             $reg_mul = get_user_meta( get_current_user_id(), "Region", true );
             echo $reg_mul; ?>">
-    <option value="CDMX" <?php if($reg_mul == "CDMX"){ echo "selected='selected'"; }?>>CDMX</option>
-    <option value="MEX" <?php if($reg_mul == "MEX"){ echo "selected='selected'"; }?>>Estado de México</option>
-    <option value="MICH" <?php if($reg_mul == "MICH"){ echo "selected='selected'"; }?>>Michoacán</option>
-    <option value="VER" <?php if($reg_mul == "VER"){ echo "selected='selected'"; }?>>Veracruz</option>
+    <option value="Noreste" <?php if($reg_mul == "Noreste"){ echo "selected='selected'"; }?>>Noreste</option>
+    <option value="Noroeste" <?php if($reg_mul == "Noroeste"){ echo "selected='selected'"; }?>>Noroeste</option>
+    <option value="Occidente" <?php if($reg_mul == "Occidente"){ echo "selected='selected'"; }?>>Occidente</option>
+    <option value="Oriente" <?php if($reg_mul == "Oriente"){ echo "selected='selected'"; }?>>Oriente</option>
+    <option value="Centronorte" <?php if($reg_mul == "Centronorte"){ echo "selected='selected'"; }?>>Centronorte</option>
+    <option value="Centrosur" <?php if($reg_mul == "Centrosur"){ echo "selected='selected'"; }?>>Centrosur</option>
+    <option value="Sureste" <?php if($reg_mul == "Sureste"){ echo "selected='selected'"; }?>>Sureste</option>
+    <option value="Suroeste" <?php if($reg_mul == "Suroeste"){ echo "selected='selected'"; }?>>Suroeste</option>
   </select>
             
             
@@ -573,21 +599,7 @@ type: 'polarArea',
              <div class="centrar"><button class="mul-botonCobrar" type="submit">Cambiar</button></div>
              </form>
             <hr/>
-            <h4>Información de mi red</h4>
-            <p> Nominado por: <?php
-            $nominador_mul = get_user_meta( get_current_user_id(), "Nominador", true );
-            $nominador_mul_texto = get_user_by('id',$nominador_mul);
-             echo $nominador_mul_texto->first_name." ".$nominador_mul_texto->last_name; ?></p><br>
-            <p> Registro en la plataforma: <?php
-            $fecha_mul = get_user_meta( get_current_user_id(), "Ingreso", true );
-           
-             echo $fecha_mul; ?></p> ?></p>
-            <p><!--<?php/*
-            if(in_array('Invalid form submission.',get_user_meta( get_current_user_id(), "Foto", true ))){
-             update_user_meta( get_current_user_id(), "Foto", "https://viveelite.com/wp-content/uploads/2021/10/vacio-1.png");   
-            }
-            echo( get_user_meta( get_current_user_id(), "Foto", true ));  */?>--></p>
-            <br><br>+<br>
+            
         </div>
 <?php 
 include_once("conn.php");
@@ -650,6 +662,85 @@ type: 'polarArea',
 </script>
 
 -->
+</div>
+        <div id="mulema-compras"  class="centrar tabcontent  contenedorTablaGrande">
+   <table  class="styled-table">
+    <thead>
+        <tr>
+            <th class="centrar" colspan="6">Compras</th>
+            
+        </tr>
+        <tr>
+            <th onclick="sortTable(0,'mul-Nvos2')">Monto</th>
+            <th onclick="sortTable(1,'mul-Nvos2')">Embajador</th>
+            <th onclick="sortTable(2,'mul-Nvos2')">Año</th>
+            <th onclick="sortTable(3,'mul-Nvos2')">Mes</th>
+            <th onclick="sortTable(4,'mul-Nvos2')">Momento</th>
+            <th> </th>
+        </tr>
+    </thead>
+    <tbody id="mul-Nvos2">  
+          
+ <?php 
+  //----------consulta a db inicio------------------------------------------------------------------------------
+include_once("conn.php");
+$sql4 = "SELECT `datetime`,`id_embajador`,`id_cliente`,`ye`, `mo`, SUM(`monto_compra`) as monto,`id_compra`  FROM `wp_mul_hipercubo` WHERE id_embajador=".get_current_user_id()." GROUP BY `id_compra`;";
+//echo "<br>".$sql4."<br>";
+$result4 = $conn->query($sql4);
+$llaves = array();
+if($result4){
+if ($result4->num_rows > 0) {
+
+  // output data of each row
+  while($row4 = $result4->fetch_assoc()) {
+      $user = get_user_by("ID", $row4["id_embajador"]);
+      echo"<tr><td>".$row4['monto']."</td><td>".$user->first_name." ".$user->last_name."</td>";
+      echo"<td>".$row4['ye']."</td><td>".$row4['mo']."</td><td>";
+  //var_dump($row4);
+  setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+  $time = strtotime($row4['datetime']);
+echo iconv('ISO-8859-2', 'UTF-8', strftime("%a %d %b %Y, %I:%M %p", strtotime($row4['datetime'])));
+echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$row4['id_embajador'].",".$row4['id_cliente'].");'>Ver</button></td></tr>";
+  }
+  }else{
+      echo "<tr> <td colspan='6'>Aún no se han registrado ventas, ¡Genera algunas ahora mismo!</td></tr>";
+  }
+}else{
+      echo $sql4;
+  }  
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+ ?>
+        <script>
+function verMul(cual,emb,cli){
+ console.log(cual);  
+  document.getElementById("gris-mul").style.display= "block";
+
+        
+    $.post(window.location.href,{
+    mul_ver_venta: cual,
+    mul_emb: emb,
+    mul_cli: cli
+  }, function(data, status){
+      //alert("Data: " + data + "\nStatus: " + status);
+      document.getElementById("overlay-mul").innerHTML = data;
+      
+    });
+  
+}          
+function cerrarMul(){
+    console.log("Cerrar");
+    document.getElementById("gris-mul").style.display= "none";
+}
+openCity(event, 'mulema-graficas');
+        </script>
+        <div id="gris-mul">
+            <button id="cerrarOverlay" onclick="cerrarMul()">X</button>
+            <div id="overlay-mul" onclick="null">
+                
+            </div>
+        </div>
+   </tbody>
+   </table>
 </div>
  </div>
 <?php

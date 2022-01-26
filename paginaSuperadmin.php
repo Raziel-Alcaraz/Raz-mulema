@@ -448,7 +448,9 @@ echo "</td></tr></form>";
 
   // Show the current tab, and add an "active" class to the button that opened the tab
   document.getElementById(cityName).style.display = "block";
+  if(evt != null){
   evt.currentTarget.className += " active";
+  }
 }
   openCity(event, 'mulema-graficas');   
      </script>
@@ -755,7 +757,7 @@ echo "</tr>";
  <?php 
   //----------consulta a db inicio------------------------------------------------------------------------------
 include_once("conn.php");
-$sql4 = "SELECT `datetime`,`id_embajador`,`id_cliente`,`ye`, `mo`, SUM(`monto_compra`) as monto,`id_compra`  FROM `wp_mul_hipercubo` WHERE id_lider=".get_current_user_id()." GROUP BY `id_compra`;";
+$sql4 = "SELECT `datetime`,`id_embajador`,`id_cliente`,`id_lider`,`ye`, `mo`, SUM(`monto_compra`) as monto,`id_compra`  FROM `wp_mul_hipercubo` GROUP BY `id_compra`;";
 //echo "<br>".$sql4."<br>";
 $result4 = $conn->query($sql4);
 $llaves = array();
@@ -764,7 +766,22 @@ if ($result4->num_rows > 0) {
 
   // output data of each row
   while($row4 = $result4->fetch_assoc()) {
+      
+      if(get_user_by("ID", $row4["id_embajador"])!=false){
       $user = get_user_by("ID", $row4["id_embajador"]);
+      //var_dump($user);
+      }
+      else{
+        
+        
+                $user2["first_name"]= "N/";
+                $user2["last_name"]="A" ;
+                $user2 =(object)$user2;
+        $user = $user2;
+        //echo "false";
+        //var_dump(get_user_by("ID", $row4["id_embajador"]));
+      }
+      
       echo"<tr><td>".$row4['monto']."</td><td>".$user->first_name." ".$user->last_name."</td>";
       echo"<td>".$row4['ye']."</td><td>".$row4['mo']."</td><td>";
   //var_dump($row4);

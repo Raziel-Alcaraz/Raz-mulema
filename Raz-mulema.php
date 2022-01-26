@@ -255,25 +255,19 @@ WC()->cart->empty_cart();
   global $woocommerce;
   
   if($value!="si"){
-      include_once("crearCupones.php");
-     include_once("pricing.php");
- //echo "POST parameter '$key' has '$value'<br>";
+
+ 
 WC()->cart->add_to_cart( $key, $value );
-//WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
   }
 }
-		 if(true){
-    //include_once("crearCupones.php");
-     //include_once("pricing.php");
-         //echo mul_get_discount_percent($_POST["producto_ID_cotiz"], mul_get_scheme(get_current_user_id()));
-     //WC()->cart->apply_coupon( crearCupon(mul_get_discount_percent($key, mul_get_scheme(get_current_user_id())),$key, get_current_user_id()) );
-			
-echo "al parecer hubo un error, has click <a href='https://viveelite.com/carrito-2/'>Aquí</a>";			 
+		
+		
+echo "Redirigiendo al carrito, si la interfaz no se actualiza en 10 segundos haz click <a href='https://viveelite.com/carrito-2/'>Aquí</a>";			 
 			 
-wp_safe_redirect( wc_get_cart_url() );   
-		 
-		 }   
-     }
+wp_redirect( 'https://viveelite.com/carrito-2/' );   
+echo "<script>location.href='https://viveelite.com/carrito-2/';</script>";
+die();
+		     }
     else if( isset( $_POST['esquemaMul'] ) &&
             isset( $_POST['esquema'] )) {
         include_once("pricing.php");
@@ -338,7 +332,7 @@ echo '<select  class="centrar2" onchange="cambioLista()" name="cosa" id="cosaMul
     while ( $loop->have_posts() ) : $loop->the_post();
         global $product;
         
-       echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'.$product->get_id()."-". $product->get_name() .'</option>'; 
+       echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'. $product->get_name() .'</option>'; 
     endwhile;   
   wp_reset_query();
             

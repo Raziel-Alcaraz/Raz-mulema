@@ -55,7 +55,7 @@ $objetoImgSerial2 = json_encode($objetoImgSerial, JSON_UNESCAPED_UNICODE|JSON_UN
     ?>
     <div class="dualesCont">
     <div class="tabcontent centrar" id="mul_catsearch">
-        <h3>Opción A: Seleccionar por categoría</h3>
+        <h3>Seleccionar por categoría</h3>
      <label class="centrar2">Categoría</label>
     <select  class="centrar2" name="cat" onChange="cambiarCat()" id="catMulema">
      <?php
@@ -246,7 +246,7 @@ echo "<optgroup id='".$i."'>";
                 }
                 </script>
         <div class="tabcontent centrar" id="mul_justsearch">
-            <h3>Opción B: Buscar por nombre o SKU</h3>
+            <h3>Buscar por nombre o SKU</h3>
             <br>
             <input id="mul_input_busq" type="text"/>
             <button onclick="buscarProducto()">Buscar</button>
