@@ -145,10 +145,12 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
         <div class="tab">
     <button class="tablinks" onclick="openCity(event, 'mulema-graficas')">Gráficas</button>
   <button class="tablinks" onclick="openCity(event, 'mulemaListas1')">Mi red</button>
+  <button class="tablinks" onclick="openCity(event, 'mulemaLista2')">Nuevas incorporaciones</button>
   <button class="tablinks" onclick="openCity(event, 'mulema-agregar')">Agregar</button>
   <button class="tablinks" onclick="openCity(event, 'mulema-datos')">Mis datos</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-compras')">Compras de Red</button>
 </div>
-        <div  class="centrar tabcontent" id="mulemaListas1">
+        <div  class="centrar tabcontent contenedorTablaGrande" id="mulemaListas1">
                <?php
  include("scriptablas.html");
  
@@ -271,19 +273,11 @@ if ($result->num_rows > 0) {
         
         
         ?>
-        <tr>
-            <td colspan="4"><form method="post">
-                    <input type="text" name="generarceseve" value="ok"   hidden>
-                    
-                  <!--  <button class="bajarCSV" type="submit">Descargar resumen</button> -->
-            
-            
-            </form></td>
         
-        </tr>
     </tbody>
 </table>
-
+        </div>
+            <div   class="centrar tabcontent contenedorTablaGrande" id="mulemaLista2">
         <table  class="styled-table">
     <thead>
         <tr>
@@ -426,9 +420,11 @@ if ($result->num_rows > 0) {
 
   // Show the current tab, and add an "active" class to the button that opened the tab
   document.getElementById(cityName).style.display = "block";
+  if(evt!=null){
   evt.currentTarget.className += " active";
+  }
 }
-     openCity(event, 'mulema-graficas');
+     openCity(null, 'mulema-graficas');
      </script>
   <?php
   
@@ -692,5 +688,84 @@ console.log($("#botonCambioEsquema-"+cual));
             <hr/>
           
         </div>
+<div id="mulema-compras"  class="centrar tabcontent  contenedorTablaGrande">
+   <table  class="styled-table">
+    <thead>
+        <tr>
+            <th class="centrar" colspan="6">Compras</th>
+            
+        </tr>
+        <tr>
+            <th onclick="sortTable(0,'mul-Nvos2')">Monto</th>
+            <th onclick="sortTable(1,'mul-Nvos2')">Embajador</th>
+            <th onclick="sortTable(2,'mul-Nvos2')">Año</th>
+            <th onclick="sortTable(3,'mul-Nvos2')">Mes</th>
+            <th onclick="sortTable(4,'mul-Nvos2')">Momento</th>
+            <th> </th>
+        </tr>
+    </thead>
+    <tbody id="mul-Nvos2">  
+          
+ <?php 
+  //----------consulta a db inicio------------------------------------------------------------------------------
+include_once("conn.php");
+$sql4 = "SELECT `datetime`,`id_embajador`,`id_cliente`,`ye`, `mo`, SUM(`monto_compra`) as monto,`id_compra`  FROM `wp_mul_hipercubo` WHERE id_lider=".get_current_user_id()." GROUP BY `id_compra`;";
+//echo "<br>".$sql4."<br>";
+$result4 = $conn->query($sql4);
+$llaves = array();
+if($result4){
+if ($result4->num_rows > 0) {
+
+  // output data of each row
+  while($row4 = $result4->fetch_assoc()) {
+      $user = get_user_by("ID", $row4["id_embajador"]);
+      echo"<tr><td>".$row4['monto']."</td><td>".$user->first_name." ".$user->last_name."</td>";
+      echo"<td>".$row4['ye']."</td><td>".$row4['mo']."</td><td>";
+  //var_dump($row4);
+  setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+  $time = strtotime($row4['datetime']);
+echo iconv('ISO-8859-2', 'UTF-8', strftime("%a %d %b %Y, %I:%M %p", strtotime($row4['datetime'])));
+echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$row4['id_embajador'].",".$row4['id_cliente'].");'>Ver</button></td></tr>";
+  }
+  }else{
+      echo "<tr> <td colspan='6'>Aún no se han registrado ventas, ¡Genera algunas ahora mismo!".get_current_user_id()."</td></tr>";
+  }
+}else{
+      echo $sql4;
+  }  
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+ ?>
+        <script>
+function verMul(cual,emb,cli){
+ console.log(cual);  
+  document.getElementById("gris-mul").style.display= "block";
+
+        
+    $.post(window.location.href,{
+    mul_ver_venta: cual,
+    mul_emb: emb,
+    mul_cli: cli
+  }, function(data, status){
+      //alert("Data: " + data + "\nStatus: " + status);
+      document.getElementById("overlay-mul").innerHTML = data;
+      
+    });
+  
+}          
+function cerrarMul(){
+    console.log("Cerrar");
+    document.getElementById("gris-mul").style.display= "none";
+}
+openCity(event, 'mulema-graficas');
+        </script>
+        <div id="gris-mul">
+            <button id="cerrarOverlay" onclick="cerrarMul()">X</button>
+            <div id="overlay-mul" onclick="null">
+                
+            </div>
+        </div>
+   </tbody>
+   </table>
+</div>
 </div>
  </div>

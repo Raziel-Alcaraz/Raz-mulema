@@ -159,6 +159,7 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
   <button class="tablinks" onclick="openCity(event, 'mulemaListas2')">Red</button>
   <button class="tablinks" onclick="openCity(event, 'mulema-agregar')">Agregar</button>
   <button class="tablinks" onclick="openCity(event, 'mulema-pricing')">Pricing</button>
+  <button class="tablinks" onclick="openCity(event, 'mulema-compras')">Compras de Red</button>
 </div>
 <div class="centrar tabcontent" id="mulemaListas1">
             
@@ -283,6 +284,7 @@ if ($result->num_rows > 0) {
             <th onclick="sortTable(3,'mul-Nvos')">Lider</th>
         <th onclick="sortTable(4,'mul-Nvos')">Esquema</th>
         <!--    <th onclick="sortTable(5,'mul-Nvos')">Embajador</th> -->
+        <th onclick="sortTable(5,'mul-Nvos')">Ventas</th>
         </tr>
     </thead>
     <tbody id="mul-Nvos">
@@ -310,6 +312,7 @@ if ($member_arr) {
       echo '<tr '.$clase."><form method='POST'>";
     //  echo '<td>'.$aidi.'</td>';
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
+          echo "<a class='invisible'>".(time() - intval(get_user_meta($aidi,"IngresoMeta", true)))."</a>";
           if(((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/3600)<1){
             echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/60).' minutos</td>';  
           }
@@ -319,7 +322,21 @@ if ($member_arr) {
           }else{
           echo '<td>'.round((time() - intval(get_user_meta($aidi,"IngresoMeta", true)))/(3600*24)).' días</td>';   
           }
-          echo '<td>'.get_user_meta($aidi,"Cargo", true).'</td>';
+          echo '<td>';
+                 if(get_user_meta($aidi,"Cargo", true)=="USUARIO VIP"){
+                  echo '<a class="invisible">1</a><i class="bi bi-star-fill"></i>'; 
+                  $tipoID = "id_cliente";
+                 }else if(get_user_meta($aidi,"Cargo", true)=="EMBAJADOR(A) REGIONAL"){
+                     $tipoID = "id_embajador";
+                  echo '<a class="invisible">2</a><i class="bi bi-star-fill"></i>'; 
+                  echo '<i class="bi bi-star-fill"></i>'; 
+                 }else  if(get_user_meta($aidi,"Cargo", true)=="GERENTE REGIONAL"){
+                     $tipoID = "id_lider";
+                  echo '<a class="invisible">3</a><i class="bi bi-star-fill"></i>'; 
+                  echo '<i class="bi bi-star-fill"></i>'; 
+                  echo '<i class="bi bi-star-fill"></i>'; 
+                 }
+          echo'</td>';
           $user =get_user_by("ID",get_user_meta($aidi,"Lider", true));
           if($user == null){
           echo '<td>N/A</td>';    
@@ -327,7 +344,7 @@ if ($member_arr) {
           echo '<td>'.$user->first_name . ' ' . $user->last_name.'</td>';
           }
           echo "<td>";
-     echo ""
+     echo "<a class='invisible'>".mul_get_scheme($aidi)."</a>"
      . '<input name="esquemaMul" value="si" hidden/>'
              . '<input name="username" value="'.$aidi.'" hidden/>'
              . '<select name="esquema" onchange="cambioEsquema('.$aidi.')">
@@ -355,14 +372,37 @@ if ($member_arr) {
              . "<button type='submit' id='botonCambioEsquema-". $aidi."' hidden>Cambiar</button>";
     echo"</td>";
         //  echo '<td>'.get_user_meta($aidi,"Embajador", true).'</td>';
-        echo    '</form></tr>';
+        echo    '';
          if($clase == 'class="active-row"'){
      $clase = "";
    }else if($clase == ""){
   $clase = 'class="active-row"';   
    }
    }
+  echo "<td>";
+  include_once("conn.php");
+
+$sql3 = "SELECT SUM(`monto_compra`) as monto_compra FROM `wp_mul_hipercubo` WHERE `".$tipoID."` = $aidi;";
+//echo "<br>".$sql."<br>";
+$result3 = $conn->query($sql3);
+if($result3){
+if ($result3->num_rows > 0) {
+
+  // output data of each row
+  while($row3 = $result3->fetch_assoc()) {
+   //var_dump($row3);
+      //echo date("Y");
+     include_once("formatoMoneda.php");
+     echo "<a class='invisible'>".formatMoney($row3["monto_compra"])."</a>";
+       echo "$".formatMoney($row3["monto_compra"]);  
   
+  }
+  }
+echo "</td></tr></form>";
+     
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+ 
+}
   }
 } else {
   echo '<tr class="active-row">
@@ -374,16 +414,7 @@ if ($member_arr) {
         ?>
         
 
-       <tr>
-            <td colspan="6"><form method="post">
-                    <input type="text" name="generarceseve" value="nvasInc"   hidden>
-                    
-                  <!--<button class="bajarCSV" type="submit">Descargar resumen</button>-->
-            
-            
-            </form></td>
-        
-        </tr>
+       
     </tbody>
 </table>           
                    
@@ -419,7 +450,7 @@ if ($member_arr) {
   document.getElementById(cityName).style.display = "block";
   evt.currentTarget.className += " active";
 }
-     openCity(event, 'mulema-graficas');
+  openCity(event, 'mulema-graficas');   
      </script>
   <?php
   
@@ -703,6 +734,86 @@ echo "</tr>";
     </tbody>
     </table>
 </div>
+<div id="mulema-compras"  class="centrar tabcontent  contenedorTablaGrande">
+   <table  class="styled-table">
+    <thead>
+        <tr>
+            <th class="centrar" colspan="6">Compras</th>
+            
+        </tr>
+        <tr>
+            <th onclick="sortTable(0,'mul-Nvos2')">Monto</th>
+            <th onclick="sortTable(1,'mul-Nvos2')">Embajador</th>
+            <th onclick="sortTable(2,'mul-Nvos2')">Año</th>
+            <th onclick="sortTable(3,'mul-Nvos2')">Mes</th>
+            <th onclick="sortTable(4,'mul-Nvos2')">Momento</th>
+            <th> </th>
+        </tr>
+    </thead>
+    <tbody id="mul-Nvos2">  
+          
+ <?php 
+  //----------consulta a db inicio------------------------------------------------------------------------------
+include_once("conn.php");
+$sql4 = "SELECT `datetime`,`id_embajador`,`id_cliente`,`ye`, `mo`, SUM(`monto_compra`) as monto,`id_compra`  FROM `wp_mul_hipercubo` WHERE id_lider=".get_current_user_id()." GROUP BY `id_compra`;";
+//echo "<br>".$sql4."<br>";
+$result4 = $conn->query($sql4);
+$llaves = array();
+if($result4){
+if ($result4->num_rows > 0) {
+
+  // output data of each row
+  while($row4 = $result4->fetch_assoc()) {
+      $user = get_user_by("ID", $row4["id_embajador"]);
+      echo"<tr><td>".$row4['monto']."</td><td>".$user->first_name." ".$user->last_name."</td>";
+      echo"<td>".$row4['ye']."</td><td>".$row4['mo']."</td><td>";
+  //var_dump($row4);
+  setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+  $time = strtotime($row4['datetime']);
+echo iconv('ISO-8859-2', 'UTF-8', strftime("%a %d %b %Y, %I:%M %p", strtotime($row4['datetime'])));
+echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$row4['id_embajador'].",".$row4['id_cliente'].");'>Ver</button></td></tr>";
+  }
+  }else{
+      echo "<tr> <td colspan='6'>Aún no se han registrado ventas, ¡Genera algunas ahora mismo!".get_current_user_id()."</td></tr>";
+  }
+}else{
+      echo $sql4;
+  }  
+//_-------------------consulta a db FIN------------------------------------------------------------------------------     
+ ?>
+    </tbody>
+   </table>
+         <script>
+function verMul(cual,emb,cli){
+ console.log(cual);  
+  document.getElementById("gris-mul").style.display= "block";
+
+        
+    $.post(window.location.href,{
+    mul_ver_venta: cual,
+    mul_emb: emb,
+    mul_cli: cli
+  }, function(data, status){
+      //alert("Data: " + data + "\nStatus: " + status);
+      document.getElementById("overlay-mul").innerHTML = data;
+      
+    });
+  
+}          
+function cerrarMul(){
+    console.log("Cerrar");
+    document.getElementById("gris-mul").style.display= "none";
+}
+        </script>
+       
+
+        <div id="gris-mul">
+            <button id="cerrarOverlay" onclick="cerrarMul()">X</button>
+            <div id="overlay-mul" onclick="null">
+                
+            </div>
+        </div>
+        </div>
 <div id="mulema-sap" class="centrar">
  <?php 
  //echo $_SERVER['HTTP_USER_AGENT'] . "--------------\n\n";
@@ -729,6 +840,6 @@ $("#botonCambioEsquema-"+cual).show();
 console.log($("#botonCambioEsquema-"+cual));
 
 }
- 
+ openCity(event, 'mulema-graficas');
 </script>
 <?php

@@ -21,7 +21,7 @@ function sortTable(n, aidi) {
     rows = table.rows;
     /* Loop through all table rows (except the
     first, which contains table headers): */
-    for (i = 0; i < (rows.length - 2); i++) {
+    for (i = 0; i < (rows.length - 1); i++) {
       // Start by saying there should be no switching:
       shouldSwitch = false;
       /* Get the two elements you want to compare,
@@ -31,7 +31,8 @@ function sortTable(n, aidi) {
       /* Check if the two rows should switch place,
       based on the direction, asc or desc: */
       if (dir == "asc") {
-        if (xt.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()
+        if ((xt.innerHTML.toLowerCase() > y.innerHTML.toLowerCase() &&( isNaN(parseFloat(xt.innerHTML))&&isNaN(parseFloat(y.innerHTML))))||
+              parseFloat(xt.innerHTML) > parseFloat(y.innerHTML) &&( !isNaN(parseFloat(xt.innerHTML))&&!isNaN(parseFloat(y.innerHTML)))
               ) {
           // If so, mark as a switch and break the loop:
           shouldSwitch = true;
@@ -39,7 +40,8 @@ function sortTable(n, aidi) {
           break;
         }
       } else if (dir == "desc") {
-        if (xt.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()
+        if ((xt.innerHTML.toLowerCase() < y.innerHTML.toLowerCase() &&( isNaN(parseFloat(xt.innerHTML))&&isNaN(parseFloat(y.innerHTML))))||
+                 parseFloat(xt.innerHTML) < parseFloat(y.innerHTML) &&( !isNaN(parseFloat(xt.innerHTML))&&!isNaN(parseFloat(y.innerHTML)))
                  ) {
           // If so, mark as a switch and break the loop:
           shouldSwitch = true;
@@ -71,11 +73,11 @@ function sortTable(n, aidi) {
   }
   for (i = 0; i < (rows.length - 1); i++) {
     if(i%2===0){
-         rows[i].className="inactive-row";
+         //rows[i].className="inactive-row";
         }
         else{
          
-         rows[i].className="active-row";
+         //rows[i].className="active-row";
         }
   }
 }

@@ -3,7 +3,7 @@
  * Plugin Name:       Mulema
  * Plugin URI:        https://miticher.com
  * Description:       Multi level marketing con woocommerce.
- * Version:           1.1
+ * Version:           1.2
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            Raziel Alcaraz
@@ -12,40 +12,36 @@
  */
 // include custom jQuery
 $mul_coupons_added = false;
-add_action( 'woocommerce_before_calculate_totals', 'mul_auto_add_coupons' );
+add_action( 'woocommerce_before_cart_totals', 'mul_auto_add_coupons',1 );
 function mul_auto_add_coupons( $cart_object ) {
-    if ( did_action( 'woocommerce_before_calculate_totals' ) > 2 ){
+    if ( did_action( 'woocommerce_before_cart_totals' ) >= 2  ){
         return;
-    }
-  WC()->cart->remove_coupons();
-    //var_dump(WC()->cart->get_cart());
-     foreach ( WC()->cart->get_cart() as $cart_item ) {
-     $vale=true;
+    }else{
+		 echo "<script>"
+    . "window.onError = function(message, source, lineno, colno, error) {
+	console.log('algo se rompió, recargando');
+	
+ location.reload();
+}
+window.addEventListener('error', function(event) {console.log('algo se rompió, recargando');location.reload(); })
+"
+            . "</script>";
+if(count(WC()->cart->get_cart_contents())<=count(WC()->cart->get_applied_coupons())){
+    return;
+}
+  //WC()->cart->remove_coupons();
+    //var_dump(WC()->cart->get_cart_for_session());
+     foreach ( WC()->cart->get_cart_for_session() as $cart_item ) {
          
          //echo "--------------------PROD:";
          //var_dump( $cart_item);
     $key= $cart_item['product_id'];
     //echo "--------------------IDPROD:". $key;
-    if(WC()->cart->get_applied_coupons()){
-    if(WC()->cart->get_applied_coupons()<1){
-     $vale=true; 
-    
-   }else{
-        var_dump(WC()->cart->get_applied_coupons());
-        foreach (WC()->cart->get_applied_coupons() as $coupon) {
-    if(str_contains($coupon, "-".$key."-")) {
-       $vale = false; 
-    }
-   }
-   }
-	}else{
-		$vale = true;
-	}
-   
-   if($vale==true){
+
        //echo "--------------------IDPROD:". $key;
-  //var_dump($coupon);
+
   //var_dump(WC()->cart->get_applied_coupons());
+    if(!WC()->cart->has_discount(get_current_user_id()."-".$key)){
  include_once("pricing.php");
          include_once("crearCupones.php");
 	   $esquema_usuario = mul_get_scheme(get_current_user_id());
@@ -59,9 +55,12 @@ function mul_auto_add_coupons( $cart_object ) {
 	   //echo "<br>2---";
 	   //var_dump($cupon_creado);
 	   //echo "<br>3---";
+           
        WC()->cart->apply_coupon( $cupon_creado );
-   }
     }
+   
+    }
+	}
 }
 function mulema_include_custom_jquery() {
 
@@ -311,6 +310,65 @@ $sql = "INSERT INTO  `wp_mul_pricing`"
     }
    
      }
+     else if(isset($_POST["mul_ver_venta"])){
+      
+      $_POST["mul_ver_venta"];
+      $_POST["mul_emb"];
+      $_POST["mul_cli"];
+      $embajador = get_user_by('id',$_POST["mul_emb"]);
+      $cliente = get_user_by('id',$_POST["mul_cli"]);
+      echo "<h1>Transacción</h1><br>";
+      echo "<b>Cliente:</b> ".$cliente->first_name ." ". $cliente->last_name;
+      echo "<br><b>Embajador:</b> ".$embajador->first_name ." ". $embajador->last_name;
+      include_once("verVenta.php");
+      verVenta($_POST["mul_ver_venta"]);
+      
+      die();
+     }else if(isset($_POST["mul_buscaprod"])){
+      
+     echo "buscando: ". $_POST["mul_buscaprod"];
+                       $args = array(
+        'post_type'      => array('product', 'product_variation'),
+        'posts_per_page' => 100,
+        's' => $_POST["mul_buscaprod"]
+    );
+
+    $loop = new WP_Query( $args );
+echo '<select  class="centrar2" onchange="cambioLista()" name="cosa" id="cosaMulemaBusqueda">';
+    while ( $loop->have_posts() ) : $loop->the_post();
+        global $product;
+        
+       echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'.$product->get_id()."-". $product->get_name() .'</option>'; 
+    endwhile;   
+  wp_reset_query();
+            
+
+        
+                     $args = array(
+        'post_type'      => array('product', 'product_variation'),
+        'posts_per_page' => 100,
+        'meta_query'             => array(
+		array(
+			'key'     => '_sku',
+			'value'   => $_POST["mul_buscaprod"],
+			'compare' => '=',
+		),
+	),    
+    );
+
+    $loop = new WP_Query( $args );
+    while ( $loop->have_posts() ) : $loop->the_post();
+        global $product;
+        
+       echo '<option class="optionsCotizMulema" value="'.$product->get_id().'" >'. $product->get_name();
+               
+               echo'</option>'; 
+    endwhile;
+  echo '<select/>';   
+  //var_dump($product);
+      die();
+     }
+     
      else{
     //echo "------------nada-------";
      }
@@ -351,7 +409,7 @@ $sql = "INSERT INTO  `wp_mul_pricing`"
    add_menu_page( 'Líder', 'Líder', 'mulema_lider', 'mulema_p0', 'mulema_lider_panel' );
  add_menu_page( 'Embajador', 'Embajador', 'mulema_embajada', 'mulema_p1', 'mulema_embajada_panel' );
   add_menu_page( 'Superadmin', 'Superadmin', 'manage_options', 'mulema_p2', 'mulema_superadmin_panel' );
-  add_menu_page( 'Cotizador', 'Cotizador', 'view_admin_dashboard', 'mulema_p3', 'mulema_cotizador_panel' );
+  add_menu_page( 'CompraFast', 'CompraFast', 'view_admin_dashboard', 'mulema_p3', 'mulema_cotizador_panel' );
  }
  function mulema_lider_panel(){
 $my_plugin_dir = WP_PLUGIN_DIR . '/mulema/';

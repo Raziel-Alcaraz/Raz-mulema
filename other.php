@@ -288,10 +288,11 @@
     text-align: center;
 }
 .centrarEnter{
-font-weigh: bolder;
+font-weight: bolder;
     text-align: center;
     display:block;
     margin:auto;
+    font-size: large;
 }
 canvas{
     margin: 20px auto;
@@ -399,3 +400,62 @@ display: none !important;
   border: 1px solid #ccc;
   border-top: none;
 } 
+
+.contenedorTablaGrande{
+width: 85vw;
+max-width: 95vw;
+display: block;
+margin: auto;
+overflow-x: scroll;
+}
+
+#gris-mul{
+ position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 9998; /* Specify a stack order in case you're using a different order for other elements */
+  //cursor: pointer; /* Add a pointer on hover */
+}
+#overlay-mul{
+ position: absolute;
+  display: block; /* Hidden by default */
+  width: 90%; /* Full width (cover the whole page) */
+  height: 80%; /* Full height (cover the whole page) */
+  top:10%;
+  left: 5%;
+  right: 5%;
+  margin: auto;
+  background-color: rgba(255,255,255,1); /* Black background with opacity */
+  z-index: 9999; /* Specify a stack order in case you're using a different order for other elements */
+  border-radius: 32px;
+  
+}
+#cerrarOverlay{
+position: absolute;
+  display: block;
+top:5%;
+  right: 5%;
+}
+.invisible{
+display: none;
+}
+.duales{
+    float: left;
+    padding: 20px;
+    width:40%;
+    margin: auto;
+}
+#dual-right{
+clear: right;
+float: right;
+}
+.dualesCont{
+    padding: 20px;
+    display: block;
+}

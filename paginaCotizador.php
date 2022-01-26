@@ -14,8 +14,13 @@ $lain = array();
 
         
 <div class="fondoCotizador">
-    <h3 class="centrar">Cotizador</h3>
+    <h2 class="centrar">CompraFast</h2>
     <br>
+         <div class="tab">
+  <button class="tablinks" onclick="openCity(event, 'mul_catsearch')">Navegar</button>
+  <button class="tablinks" onclick="openCity(event, 'mul_justsearch')">Búsqueda inteligente</button>
+  
+</div>
 	   <?php 
            /*
     $id = 3298;
@@ -48,6 +53,9 @@ $objetoImgSerial2 = json_encode($objetoImgSerial, JSON_UNESCAPED_UNICODE|JSON_UN
 //	echo "<br>";echo "<br>";
   //   echo json_encode($objetoGE, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
     ?>
+    <div class="dualesCont">
+    <div class="tabcontent centrar" id="mul_catsearch">
+        <h3>Opción A: Seleccionar por categoría</h3>
      <label class="centrar2">Categoría</label>
     <select  class="centrar2" name="cat" onChange="cambiarCat()" id="catMulema">
      <?php
@@ -219,6 +227,34 @@ echo "<optgroup id='".$i."'>";
     
     <label class="centrar2">Cantidad (piezas)</label>
     <input class="centrar2" value="1" type="number" id="numeroCosasMulema"/>
+    </div>
+        <script>
+                function buscarProducto(){
+                    console.log("buscando...");
+                    var operator = $("#mul_input_busq").val();
+                   $.post(window.location.href,{
+    mul_buscaprod: operator
+  }, function(data, status){
+      //alert("Data: " + data + "\nStatus: " + status);
+      if(true){
+          console.log(status);
+          $("#mul_prev_prod").html(data);
+      }
+      
+      
+    });   
+                }
+                </script>
+        <div class="tabcontent centrar" id="mul_justsearch">
+            <h3>Opción B: Buscar por nombre o SKU</h3>
+            <br>
+            <input id="mul_input_busq" type="text"/>
+            <button onclick="buscarProducto()">Buscar</button>
+            <div id="mul_prev_prod">
+            </div>
+            
+        </div>
+    </div>
     <br><br><br>
      <div class="triplesContBtn">
                
@@ -280,7 +316,16 @@ echo "<optgroup id='".$i."'>";
        var formatter = new Intl.NumberFormat('es-MX', {
   style: 'currency',
   currency: 'MXN',
-});   
+});  
+function mul_agregar_desdebusqueda(){
+ document.getElementById("numeroCosasMulema").value = 1;   
+ document.getElementById("cosaMulema").value = document.getElementById("cosaMulemaBusqueda").value;
+ 
+}
+function cambioLista(){
+ document.getElementById("cosaMulema").value = document.getElementById("cosaMulemaBusqueda").value;   
+ document.getElementById("variationsMul").value = document.getElementById("cosaMulemaBusqueda").value; 
+}
     function mul_agregar(){
         var valorvariante = document.getElementById("variationsMul").value;
         console.log("valorvariante"+valorvariante);
@@ -329,14 +374,24 @@ echo "<optgroup id='".$i."'>";
       td6.className = "aidisT";
      
       tr.className = "active-row";
+      if(lain.get(document.getElementById("cosaMulema").value)!=null){
       td0.innerText = lain.get(document.getElementById("cosaMulema").value)[0];
+  }else{
+      td0.innerText = lain.get(document.getElementById("variationsMul").value)[0];
+    }
       if(valorvariante !== null){
       
         td0.innerText = lain.get(valorvariante)[0];
     }
       tdi3.value = parseInt(document.getElementById("numeroCosasMulema").value);
+      
+      if(lain.get(document.getElementById("cosaMulema").value)!=null){
       td1.innerText = parseFloat(lain.get(document.getElementById("cosaMulema").value)[1])
-              *parseInt(document.getElementById("numeroCosasMulema").value);
+  }
+  else{
+     td1.innerText = parseFloat(lain.get(document.getElementById("variationsMul").value)[1]) *parseInt(document.getElementById("numeroCosasMulema").value);
+    }
+              
       
       if(valorvariante !== null){
        td1.innerText = parseFloat(lain.get(valorvariante)[1])
@@ -359,13 +414,19 @@ echo "<optgroup id='".$i."'>";
     $(this).find('.aidis').each(function(){
         console.log("abreciclo");
        cuantosvan++;
-       if ($(this).val()===document.getElementById("cosaMulema").value ||
+       console.log(document.getElementById("cosaMulema").value);
+       if (($(this).val()===document.getElementById("cosaMulema").value && document.getElementById("cosaMulema").value!=="") ||
             (
            $(this).val()===valorvariante 
            && valorvariante!= null 
                ) ){
             console.log("duplicado");
+           if(lain.get(document.getElementById("cosaMulema").value)!=null){ 
           td0.innerText = lain.get(document.getElementById("cosaMulema").value)[0];
+      }
+      else{
+          td0.innerText = lain.get(document.getElementById("variationsMul").value)[0];
+      }
      if(valorvariante !== null){
         
        td0.innerText = lain.get(valorvariante)[0];
@@ -378,8 +439,13 @@ echo "<optgroup id='".$i."'>";
        tdi3.value = parseInt($(this).val().replace(',', '').replace('$', '')) 
                + parseInt(document.getElementById("numeroCosasMulema").value);
         console.log(tdi3.value);
+        if(lain.get(document.getElementById("cosaMulema").value)!=null){
        td1.innerText = parseFloat(lain.get(document.getElementById("cosaMulema").value)[1])
               *parseInt(tdi3.value);
+  }else{
+      td1.innerText = parseFloat(lain.get(document.getElementById("variationsMul").value)[1])
+              *parseInt(tdi3.value);
+        }
       if(valorvariante !== null){
          td1.innerText = parseFloat(lain.get(valorvariante)[1])
               *parseInt(tdi3.value); 
@@ -681,7 +747,29 @@ $('#row_productos tr').each(function(){
       return("...");
     });
   }
-    
+            function openCity(evt, cityName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(cityName).style.display = "block";
+  if(evt!=null){
+  evt.currentTarget.className += " active";
+  }
+}
+     openCity(null, 'mul_justsearch'); 
     </script>    
 <div>
 </div>
