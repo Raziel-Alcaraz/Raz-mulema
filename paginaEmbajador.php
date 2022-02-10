@@ -672,7 +672,7 @@ type: 'polarArea',
         </tr>
         <tr>
             <th onclick="sortTable(0,'mul-Nvos2')">Monto</th>
-            <th onclick="sortTable(1,'mul-Nvos2')">Embajador</th>
+            <th onclick="sortTable(1,'mul-Nvos2')">Cliente</th>
             <th onclick="sortTable(2,'mul-Nvos2')">Año</th>
             <th onclick="sortTable(3,'mul-Nvos2')">Mes</th>
             <th onclick="sortTable(4,'mul-Nvos2')">Momento</th>
@@ -693,7 +693,7 @@ if ($result4->num_rows > 0) {
 
   // output data of each row
   while($row4 = $result4->fetch_assoc()) {
-      $user = get_user_by("ID", $row4["id_embajador"]);
+      $user = get_user_by("ID", $row4["id_cliente"]);
       echo"<tr><td>".$row4['monto']."</td><td>".$user->first_name." ".$user->last_name."</td>";
       echo"<td>".$row4['ye']."</td><td>".$row4['mo']."</td><td>";
   //var_dump($row4);

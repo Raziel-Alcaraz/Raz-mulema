@@ -14,7 +14,7 @@ $lain = array();
 
         
 <div class="fondoCotizador">
-    <h2 class="centrar">CompraFast</h2>
+    <h2 id="titlecomprafast"class="centrar">CompraFast</h2>
     <br>
          <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'mul_catsearch')">Navegar</button>
@@ -58,6 +58,7 @@ $objetoImgSerial2 = json_encode($objetoImgSerial, JSON_UNESCAPED_UNICODE|JSON_UN
         <h3>Seleccionar por categoría</h3>
      <label class="centrar2">Categoría</label>
     <select  class="centrar2" name="cat" onChange="cambiarCat()" id="catMulema">
+    <option class="centrar2" value="0" selected disabled>Seleccione</option>  
      <?php
      
          $taxonomy     = 'product_cat';
@@ -86,9 +87,10 @@ $objetoImgSerial2 = json_encode($objetoImgSerial, JSON_UNESCAPED_UNICODE|JSON_UN
        
        echo '<option class="centrar2" value="'.$category_id.'"  >'. strtoupper($cat->name) .'</option>';
  
-    }       
+    }
+    
 }
-     
+   
      ?>
     </select>
         <br>
@@ -179,13 +181,18 @@ $objetoImgSerial2 = json_encode($objetoImgSerial, JSON_UNESCAPED_UNICODE|JSON_UN
                  . "".$product->get_price()."]";
                }
     endwhile;
+    
 if($category_id != $refcat && $category_id != 0){
+    
         echo    "</optgroup>";
         $refcat = $category_id;
         }
     wp_reset_query();
     }       
 }
+echo    "<optgroup>";
+echo '<option class="optionsCotizMulema" value="0" selected disabled>Seleccione</option>';
+echo    "</optgroup>";
 ?>
     </select>
     
@@ -194,7 +201,8 @@ if($category_id != $refcat && $category_id != 0){
     
     <br>
      <label class="centrar2">Variaciones</label>
-    <select id="variationsMul" name="var"    class="centrar2">
+    <select id="variationsMul" name="var" onchange="visibilizarboton2()"   class="centrar2">
+        <option class="centrar2" value="0" selected disabled>Seleccione</option> 
         <?php     
         foreach ($lain as $i => $value) {
    
@@ -227,6 +235,7 @@ echo "<optgroup id='".$i."'>";
     
     <label class="centrar2">Cantidad (piezas)</label>
     <input class="centrar2" value="1" type="number" id="numeroCosasMulema"/>
+     <button onclick="mul_agregar()" id="botonmas2"><i class="bi bi-plus-lg"></i></button>
     </div>
         <script>
                 function buscarProducto(){
@@ -252,25 +261,16 @@ echo "<optgroup id='".$i."'>";
             <button onclick="buscarProducto()">Buscar</button>
             <div id="mul_prev_prod">
             </div>
-            
+            <button onclick="mul_agregar()" id="botonmas"><i class="bi bi-plus-lg"></i></button>
         </div>
     </div>
     <br><br><br>
-     <div class="triplesContBtn">
-               
-                    <button onclick="mul_Publico()"  class="triplesBtn">
-    Ocultar columnas</button>
-               
-    
-                    <button onclick="mul_Privado()"  class="triplesBtn">Mostrar columnas</button>
- 
-   
-                    <button onclick="mul_agregar()" class="triplesBtn">Agregar producto</button> <span class="stretch"></span>
-   </div>
+
     <br><form method="post" id="formatoAgregar">
         <input hidden type="text" value="si" name="agregarAlPincheCarro"/>
         <div id="contenedorCotizacion">
-    <table id="cotizacionMulema"  class="styled-table">
+            
+        <table id="cotizacionMulema"  class="styled-table">
        
   <col class="COSAS"/>
   <col class="xp3"/>
@@ -280,7 +280,7 @@ echo "<optgroup id='".$i."'>";
   <col class="sumaP5"/>
   <thead> <tr>
        
-        <th class="COSAS">Descripción</th>
+          <th class="COSAS">Descripción <div id="manita"><div id="estela"></div><i class="bi bi-hand-index"></i></div></th>
         <th class="sumaP1" >Cantidad</th>
         <th id="mul_pricename">Precio al público</th>
         <th class="sumaP2">Descuento Tipo <?php echo  mul_get_scheme(get_current_user_id()); ?></th>
@@ -293,12 +293,17 @@ echo "<optgroup id='".$i."'>";
         <tbody id="row_productos">
             
         </tbody>
-    </table></form></div>
-  
-                    <button id="mul_send2Cart" onclick="mandarDatos()" class="botoncentrado">Confirmar</button>
+    </table></form>
+    
+   </div>
+        <div class="triplesCont">
+    <button onclick="mul_Publico()" type="button" class="ojo" id="mostrarColsBtn"><i class="bi bi-eye-slash-fill"></i></button>
+    <button onclick="mul_Privado()"  type="button" class="ojo" id="ocultarColsBtn"><i class="bi bi-eye-fill"></i></button><span class="stretch"></span></div>
+     <script>$("#ocultarColsBtn").hide();$("#mostrarColsBtn").hide();</script>  
+    <button id="mul_send2Cart" class="preanimacionActivar" onclick="mandarDatos()">Continuar</button>
                    
     <script>
-		
+	$("#mul_send2Cart").prop( "disabled", true );	
       var sumaP1=0;
        var sumaP2=0;
        var xP3=0;
@@ -322,11 +327,47 @@ function mul_agregar_desdebusqueda(){
  document.getElementById("cosaMulema").value = document.getElementById("cosaMulemaBusqueda").value;
  
 }
+function invisibilizarboton2(){
+  document.getElementById("botonmas2").style.display= "none";  
+}
+function visibilizarboton2(){
+  document.getElementById("botonmas2").style.display= "block";  
+}
+function invisibilizarboton(){
+  document.getElementById("botonmas").style.display= "none";  
+}
+function visibilizarboton(){
+  document.getElementById("botonmas").style.display= "block";  
+}
+function invisibilizarmanita(){
+  document.getElementById("manita").style.display= "none";  
+}
+function visibilizarmanita(){
+  document.getElementById("manita").style.display= "inline";  
+  var delayInMilliseconds = 4000; //1 second
+
+setTimeout(function() {
+  //your code to be executed after 1 second
+  invisibilizarmanita();
+}, delayInMilliseconds);
+}
 function cambioLista(){
+    if(document.getElementById("cosaMulemaBusqueda").value !=""){
  document.getElementById("cosaMulema").value = document.getElementById("cosaMulemaBusqueda").value;   
  document.getElementById("variationsMul").value = document.getElementById("cosaMulemaBusqueda").value; 
+    }
+    document.getElementById("botonmas").display= "block";
+    visibilizarboton();
 }
     function mul_agregar(){
+        
+        document.getElementById("contenedorCotizacion").style.display= "block";
+      $("#ocultarColsBtn").show();
+        if( (lain.get(document.getElementById("cosaMulema").value)==="" ||  lain.get(document.getElementById("cosaMulema").value)==null)&&
+              (lain.get(document.getElementById("variationsMul").value)==="" ||  lain.get(document.getElementById("variationsMul").value)==null)  ){
+            console.log("nada");
+            return;
+        }
         var valorvariante = document.getElementById("variationsMul").value;
         console.log("valorvariante"+valorvariante);
         if(valorvariante===""){
@@ -374,7 +415,7 @@ function cambioLista(){
       td6.className = "aidisT";
      
       tr.className = "active-row";
-      if(lain.get(document.getElementById("cosaMulema").value)!=null){
+      if(lain.get(document.getElementById("cosaMulema").value)!=null && lain.get(document.getElementById("cosaMulema").value)!=""){
       td0.innerText = lain.get(document.getElementById("cosaMulema").value)[0];
   }else{
       td0.innerText = lain.get(document.getElementById("variationsMul").value)[0];
@@ -487,7 +528,11 @@ function cambioLista(){
           window.alert("Agrega al menos un elemento");
           document.getElementById("numeroCosasMulema").value = 1;
           }
-   
+   visibilizarmanita();
+   $("#mul_send2Cart").addClass("animacionActivar");
+   $("#mul_send2Cart").removeClass("preanimacionActivar");
+   $("#mul_send2Cart").addClass("postanimacionActivar");
+   $("#mul_send2Cart").prop( "disabled", false );
 }
         function mul_Publico(){
             document.getElementById('mul_pricename').innerText="Precio"
@@ -514,7 +559,10 @@ function cambioLista(){
         $(this).hide();
         });
     
-    });       
+    });  
+    $("#mostrarColsBtn").hide();
+    $("#ocultarColsBtn").show();
+    invisibilizarmanita();
         }
         function mul_Privado(){
           /*  show_hide_column(5, "visible");
@@ -541,6 +589,9 @@ function cambioLista(){
         $(this).show();
         });
     }); 
+    $("#mostrarColsBtn").show();
+    $("#ocultarColsBtn").hide();
+    visibilizarmanita();
             /*
             document.getElementsByClassName("col4")[0].style.display= "inline";
              document.getElementsByClassName("col5")[0].style.display= "inline";
@@ -571,6 +622,10 @@ function cambioLista(){
         }
         // Create our number formatter.
         */
+           $( "#contenedorCotizacion" ).scroll(function() {
+  $( "#log" ).append( "<div>Handler for .scroll() called.</div>" );
+  invisibilizarmanita();
+});
 function mandarDatos(){
     console.log("enviando");
 			
@@ -705,6 +760,7 @@ $('#row_productos tr').each(function(){
     });
     });
      $('#variationsMul').val(null);
+     invisibilizarboton2();
     }
      function cambiarVar(){
      console.log("CV");
@@ -722,6 +778,7 @@ $('#row_productos tr').each(function(){
     });  
     }); 
      $('#variationsMul').val(null);
+     visibilizarboton2();
     }
     function cotizar(tipo,id, element,valorOtro){
         

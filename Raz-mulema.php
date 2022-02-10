@@ -11,10 +11,14 @@
  * License:           GPL v2 or later
  */
 // include custom jQuery
+function mul_scripts() {
+    wp_enqueue_style( 'mulema-style',  plugins_url().'/Raz-mulema/'."estilos.css" );
+}
+add_action( 'wp_enqueue_scripts', 'mul_scripts' );
 $mul_coupons_added = false;
 add_action( 'woocommerce_before_cart_totals', 'mul_auto_add_coupons',1 );
 function mul_auto_add_coupons( $cart_object ) {
-    if ( did_action( 'woocommerce_before_cart_totals' ) >= 2  ){
+    if ( did_action( 'woocommerce_before_cart_totals' ) >= 2 || get_current_user_id()==0 ){
         return;
     }else{
 		 echo "<script>"
@@ -313,7 +317,7 @@ $sql = "INSERT INTO  `wp_mul_pricing`"
       $cliente = get_user_by('id',$_POST["mul_cli"]);
       echo "<h1>Transacción</h1><br>";
       echo "<b>Cliente:</b> ".$cliente->first_name ." ". $cliente->last_name;
-      echo "<br><b>Embajador:</b> ".$embajador->first_name ." ". $embajador->last_name;
+      echo "<br><b>Socio:</b> ".$embajador->first_name ." ". $embajador->last_name;
       include_once("verVenta.php");
       verVenta($_POST["mul_ver_venta"]);
       
@@ -329,6 +333,7 @@ $sql = "INSERT INTO  `wp_mul_pricing`"
 
     $loop = new WP_Query( $args );
 echo '<select  class="centrar2" onchange="cambioLista()" name="cosa" id="cosaMulemaBusqueda">';
+ echo '<option class="optionsCotizMulema" value="0" selected disabled >Seleccione</option>'; 
     while ( $loop->have_posts() ) : $loop->the_post();
         global $product;
         
@@ -401,7 +406,7 @@ echo '<select  class="centrar2" onchange="cambioLista()" name="cosa" id="cosaMul
 
  function mulema_add_panels() {
    add_menu_page( 'Líder', 'Líder', 'mulema_lider', 'mulema_p0', 'mulema_lider_panel' );
- add_menu_page( 'Embajador', 'Embajador', 'mulema_embajada', 'mulema_p1', 'mulema_embajada_panel' );
+ add_menu_page( 'Socio', 'Socio', 'mulema_embajada', 'mulema_p1', 'mulema_embajada_panel' );
   add_menu_page( 'Superadmin', 'Superadmin', 'manage_options', 'mulema_p2', 'mulema_superadmin_panel' );
   add_menu_page( 'CompraFast', 'CompraFast', 'view_admin_dashboard', 'mulema_p3', 'mulema_cotizador_panel' );
  }
@@ -740,6 +745,20 @@ $array_prods = array();
 }
 */
 //---------------ocultamiento iOS termina----------------------------------------------
+//-----------botón volver al carrito inicio-------------------------------------------------
+add_action( 'woocommerce_before_checkout_form', 'mulema_custom_checkout' );
+
+function mulema_custom_checkout( $checkout ) {
+echo "<a href='https://viveelite.com/carrito-2/'><button>Volver al carrito</button></a>";
+}
+//-----------botón volver al carrito fin-------------------------------------------------
+//-----------botón volver a comprar inicio-------------------------------------------------
+add_action( 'woocommerce_before_single_product', 'mulema_custom_boton_producto' );
+
+function mulema_custom_boton_producto( $checkout ) {
+echo "<a href='https://viveelite.com/tienda-2/'><button>Volver a la tienda</button></a>";
+}
+//-----------botón volver a comprar fin-------------------------------------------------
 /**
  * Deactivation hook.
  */
