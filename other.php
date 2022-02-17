@@ -494,7 +494,7 @@ padding-bottom: 75px;
   from {right: 5vw;}
   to {right: 60vw;}
 }
-#manita {
+#manita, #manita2, #manita3 {
   color: white;
   font-size: xx-large;
   animation-name: slideright;
@@ -504,7 +504,7 @@ padding-bottom: 75px;
   position: absolute;
   animation-iteration-count: infinite;
 }
-#estela{
+#estela, #estela2{
 display: inline-block;
 transform: translate(85px,-20px);
 width: 70px;
@@ -568,4 +568,39 @@ background: rgb(174,134,37);
 background: linear-gradient(90deg, rgba(174,134,37,1) 50%, rgba(249,242,149,1) 79%, rgba(146,111,52,1) 100%);
 color: black;
 font-size: x-large;
+}
+.pointerz{
+cursor: pointer;
+}
+#mensajeImportante{
+position: fixed;
+top: 10vh;
+bottom: 5vh;
+left: 5%;
+margin: auto;
+display: block;
+width: 90%;
+background-color: rgba(255,255,255,0.8);
+border-radius: 16px;
+z-index: 250;
+}
+#cerrarMensajeImportante{
+position: absolute;
+top: 2%;
+right: 5%;
+font-size: xx-large;
+}
+#camposusuario{
+color: black;
+text-align:center;
+opacity: 100%;
+}
+#camposusuario button{
+color: white;
+text-align:center;
+background-color: #2c5796;
+font-size: large;
+font-weight: bold;
+border: none;
+padding: 5px;
 }

@@ -265,15 +265,15 @@ if ($result->num_rows > 0) {
     </tbody>
 </table>
 </div>
-<div class="centrar tabcontent" id="mulemaListas2">        
+<div class="centrar tabcontent contenedorTablaGrande" id="mulemaListas2">        
             <?php
  include("scriptablas.html");
  include_once("pricing.php");
  ?>
-        <table  class="styled-table">
+        <table  id="mulemaListas2tab"  class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="6">Red Vive Elite</th>
+            <th class="centrar" colspan="6">Red Vive Elite<div id="manita"><div id="estela"></div><i class="bi bi-hand-index"></i></div></th>
             
         </tr>
         <tr>
@@ -448,6 +448,15 @@ echo "</td></tr></form>";
 
   // Show the current tab, and add an "active" class to the button that opened the tab
   document.getElementById(cityName).style.display = "block";
+  if(cityName == "mulemaListas2"){
+      visibilizarmanita();
+  }
+  else if(cityName == "mulema-pricing"){
+      visibilizarmanita2();
+  }
+  else if(cityName == "mulema-compras"){
+      visibilizarmanita3();
+  }
   if(evt != null){
   evt.currentTarget.className += " active";
   }
@@ -656,12 +665,11 @@ type: 'polarArea',
             <br><br>
     </form>
 </div> 
-<div id="mulema-pricing" class="centrar tabcontent">
-    <h2>Pricing table</h2> 
-    <table  class="styled-table">
+<div id="mulema-pricing" class="centrar tabcontent contenedorTablaGrande"">
+    <table  id="mulema-pricingtab"  class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="6">Esquemas de precios</th>
+            <th class="centrar" colspan="6">Esquemas de precios <div id="manita2"><div id="estela"></div><i class="bi bi-hand-index"></i></div></th>
             
         </tr>
         <tr>
@@ -737,10 +745,10 @@ echo "</tr>";
     </table>
 </div>
 <div id="mulema-compras"  class="centrar tabcontent  contenedorTablaGrande">
-   <table  class="styled-table">
+   <table  id="mulema-comprastab"  class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="6">Compras</th>
+            <th class="centrar" colspan="6">Compras<div id="manita3"><div id="estela"></div><i class="bi bi-hand-index"></i></div></th>
             
         </tr>
         <tr>
@@ -858,5 +866,49 @@ console.log($("#botonCambioEsquema-"+cual));
 
 }
  openCity(event, 'mulema-graficas');
+ function invisibilizarmanita(){
+  document.getElementById("manita").style.display= "none";  
+}
+function visibilizarmanita(){
+  if($("#mulemaListas2").width() <=  $("#mulemaListas2tab").width()){ 
+  document.getElementById("manita").style.display= "inline";  
+  var delayInMilliseconds = 4000; //1 second
+
+setTimeout(function() {
+  //your code to be executed after 1 second
+  invisibilizarmanita();
+}, delayInMilliseconds);
+  }
+}
+function invisibilizarmanita2(){
+  document.getElementById("manita2").style.display= "none";  
+}
+function visibilizarmanita2(){
+    
+    if($("#mulema-pricing").width() <=  $("#mulema-pricingtab").width()){ 
+  document.getElementById("manita2").style.display= "inline";  
+  var delayInMilliseconds = 4000; //1 second
+
+setTimeout(function() {
+  //your code to be executed after 1 second
+  invisibilizarmanita2();
+}, delayInMilliseconds);
+}
+}
+function invisibilizarmanita3(){
+  document.getElementById("manita3").style.display= "none";  
+}
+function visibilizarmanita3(){
+    
+    if($("#mulema-compras").width() <=  $("#mulema-comprastab").width()){ 
+  document.getElementById("manita3").style.display= "inline";  
+  var delayInMilliseconds = 4000; //1 second
+
+setTimeout(function() {
+  //your code to be executed after 1 second
+  invisibilizarmanita3();
+}, delayInMilliseconds);
+}
+}
 </script>
 <?php

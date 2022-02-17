@@ -12,9 +12,9 @@
  */
 // include custom jQuery
 function mul_scripts() {
-    wp_enqueue_style( 'mulema-style',  plugins_url().'/Raz-mulema/'."estilos.css" );
+    //wp_enqueue_style( 'mulema-style',  plugins_url().'/Raz-mulema/'."estilos.css" );
 }
-add_action( 'wp_enqueue_scripts', 'mul_scripts' );
+//add_action( 'wp_enqueue_scripts', 'mul_scripts' );
 $mul_coupons_added = false;
 add_action( 'woocommerce_before_cart_totals', 'mul_auto_add_coupons',1 );
 function mul_auto_add_coupons( $cart_object ) {
@@ -367,13 +367,30 @@ echo '<select  class="centrar2" onchange="cambioLista()" name="cosa" id="cosaMul
   //var_dump($product);
       die();
      }
-     
+     else if(isset($_POST["eliminarUser"])){
+        $args =  $_POST["eliminarUser"];
+        require_once(ABSPATH.'wp-admin/includes/user.php');
+        add_action("borrarAEsteWey",function() use ( $args ) { 
+               borraruser( $args ); });
+               do_action("borrarAEsteWey");
+        die();
+     }
+     else if(isset($_POST["editarUser"])){
+       include("camposusuario.php");
+        echo"ola";
+        die();
+     }
      else{
     //echo "------------nada-------";
      }
  
 }
- 
+function borraruser($cual){
+    wp_delete_user( $cual);
+    echo"según sí";
+    //remove_action("init","borraruser");
+    
+} 
  
 /**
   * Register the embajador, cliente and lider custom user types

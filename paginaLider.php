@@ -1,5 +1,32 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<script>
+function eliminarUser(id, nombre){
+   if(window.confirm("¿De verdad desea eliminar a "+nombre+"?")){
+      $.post(window.location.href,{
+    eliminarUser: id
+  }, function(data, status){
+      location.reload();
+     
+    }); 
+    return("...");
+   }
+}   
+function editarUser(id, nombre){
+    //window.alert("Usted no puede editar el perfil de "+nombre);
+
+      $.post(window.location.href,{
+    editarUser: id
+  }, function(data, status){
+      $("#mensajeImportante").show();
+      $("#campoMensaje").html(data);
+     console.log(data);
+     console.log(status);
+    }); 
+    return("...");
+   
+} 
+</script>
 <style>
    <?php
 include('other.php');
@@ -89,6 +116,8 @@ if((intval($interval->format("%a")))<365){
 }
 
 ?></h2>
+        <div id="mensajeImportante"><i class="bi bi-x" id="cerrarMensajeImportante" onclick="$('#mensajeImportante').hide();"></i><div id="campoMensaje"></div></div>
+        <script> $("#mensajeImportante").hide();</script>
         <img id="mulema-imagenLogo" src="https://viveelite.com/wp-content/uploads/2021/07/Vive-Elite-Minimal-Blanco.png"/>
         <div id="fotoPerfilContainer">
      
@@ -155,10 +184,10 @@ echo $current_user->user_firstname." ".$current_user->user_lastname;
  include("scriptablas.html");
  
  ?>
-            <table class="styled-table">
+            <table id="mulemaListas1tab" class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="4">Mi red</th>
+            <th class="centrar" colspan="4">Mi red<div id="manita"><div id="estela"></div><i class="bi bi-hand-index"></i></div></th>
             
         </tr>
         <tr>
@@ -198,7 +227,9 @@ if ($member_arr) {
        
        
       echo '<tr '.$clase."><form method='post'>";
-          echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
+          echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.' '
+                  . '<i class="bi bi-trash pointerz" onclick=eliminarUser('.$user->ID.',"'.$usuario->first_name.'")></i> '
+                  . '<i class="bi bi-pen pointerz" onclick=editarUser('.$user->ID.',"'.$usuario->first_name.'")></i></td>';
           //----------consulta a db inicio------------------------------------------------------------------------------
             
   
@@ -420,11 +451,19 @@ if ($result->num_rows > 0) {
 
   // Show the current tab, and add an "active" class to the button that opened the tab
   document.getElementById(cityName).style.display = "block";
+  if(cityName=="mulemaListas1"){
+      visibilizarmanita();
+  }
+  else if(cityName=="mulema-compras"){
+      visibilizarmanita2();
+  }
   if(evt!=null){
   evt.currentTarget.className += " active";
   }
 }
      openCity(null, 'mulema-graficas');
+     $("#mulemaListas1").click(function() {invisibilizarmanita();});
+     $("#mulema-compras").click(function() {invisibilizarmanita2();});
      </script>
   <?php
   
@@ -693,10 +732,10 @@ console.log($("#botonCambioEsquema-"+cual));
           
         </div>
 <div id="mulema-compras"  class="centrar tabcontent  contenedorTablaGrande">
-   <table  class="styled-table">
+   <table id="mulema-comprastab"  class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="6">Compras</th>
+            <th class="centrar" colspan="6">Compras<div id="manita2"><div id="estela2"></div><i class="bi bi-hand-index"></i></div></th>
             
         </tr>
         <tr>
@@ -761,6 +800,35 @@ function cerrarMul(){
     document.getElementById("gris-mul").style.display= "none";
 }
 openCity(event, 'mulema-graficas');
+function invisibilizarmanita(){
+  document.getElementById("manita").style.display= "none";  
+}
+function visibilizarmanita(){
+  if($("#mulemaListas1").width() <=  $("#mulemaListas1tab").width()){ 
+  document.getElementById("manita").style.display= "inline";  
+  var delayInMilliseconds = 4000; //1 second
+
+setTimeout(function() {
+  //your code to be executed after 1 second
+  invisibilizarmanita();
+}, delayInMilliseconds);
+  }
+}
+function invisibilizarmanita2(){
+  document.getElementById("manita2").style.display= "none";  
+}
+function visibilizarmanita2(){
+    
+    if($("#mulema-compras").width() <=  $("#mulema-comprastab").width()){ 
+  document.getElementById("manita2").style.display= "inline";  
+  var delayInMilliseconds = 4000; //1 second
+
+setTimeout(function() {
+  //your code to be executed after 1 second
+  invisibilizarmanita2();
+}, delayInMilliseconds);
+}
+}
         </script>
         <div id="gris-mul">
             <button id="cerrarOverlay" onclick="cerrarMul()">X</button>

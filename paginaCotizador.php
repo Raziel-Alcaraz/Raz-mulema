@@ -343,6 +343,8 @@ function invisibilizarmanita(){
   document.getElementById("manita").style.display= "none";  
 }
 function visibilizarmanita(){
+    
+    if($("#contenedorCotizacion").width() <=  $("#cotizacionMulema").width()){
   document.getElementById("manita").style.display= "inline";  
   var delayInMilliseconds = 4000; //1 second
 
@@ -350,6 +352,7 @@ setTimeout(function() {
   //your code to be executed after 1 second
   invisibilizarmanita();
 }, delayInMilliseconds);
+}
 }
 function cambioLista(){
     if(document.getElementById("cosaMulemaBusqueda").value !=""){
