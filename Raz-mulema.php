@@ -770,10 +770,27 @@ echo "<a href='https://viveelite.com/carrito-2/'><button>Volver al carrito</butt
 }
 //-----------botón volver al carrito fin-------------------------------------------------
 //-----------botón volver a comprar inicio-------------------------------------------------
-add_action( 'woocommerce_before_single_product', 'mulema_custom_boton_producto' );
+add_action( 'woocommerce_product_meta_end', 'mulema_custom_boton_producto' );
 
 function mulema_custom_boton_producto( $checkout ) {
-echo "<a href='https://viveelite.com/tienda-2/'><button>Volver a la tienda</button></a>";
+echo "<br><a href='https://viveelite.com/tienda-2/'><button>Seguir comprando</button></a>"
+    . "<style> @keyframes example {
+  from {background-color: red;}
+  to {background-color: yellow;}
+}
+.blinkear{
+animation-name: example;
+  animation-duration: 4s;
+}
+</style>
+<script>
+$( '.variations' ).each(function( index ) {
+  console.log( index +' : ' + $( this ).text() );
+  $( this ).find('select').each(function(){
+  $(this).addClass('blinkear');
+  });
+});
+</script>";
 }
 //-----------botón volver a comprar fin-------------------------------------------------
 /**

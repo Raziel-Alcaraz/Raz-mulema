@@ -247,9 +247,9 @@ echo "<optgroup id='".$i."'>";
       //alert("Data: " + data + "\nStatus: " + status);
       if(true){
           console.log(status);
-          $("#mul_prev_prod").html(data);
+          
       }
-      
+     
       
     });   
                 }
