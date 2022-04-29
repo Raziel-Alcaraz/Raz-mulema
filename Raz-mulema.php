@@ -306,15 +306,15 @@ $sql = "INSERT INTO  `wp_mul_pricing`"
     }else{
         
     }
-   
+    die("Cambiado exitosamente!");
      }
      else if(isset($_POST["mul_ver_venta"])){
       
       $_POST["mul_ver_venta"];
       $_POST["mul_emb"];
       $_POST["mul_cli"];
-      $embajador = get_user_by('id',$_POST["mul_emb"]);
-      $cliente = get_user_by('id',$_POST["mul_cli"]);
+      $embajador = get_user_by('id',$_POST["mul_emb"])?:wp_get_current_user();
+      $cliente = get_user_by('id',$_POST["mul_cli"])?:$embajador;
       echo "<h1>Transacción</h1><br>";
       echo "<b>Cliente:</b> ".$cliente->first_name ." ". $cliente->last_name;
       echo "<br><b>Socio:</b> ".$embajador->first_name ." ". $embajador->last_name;

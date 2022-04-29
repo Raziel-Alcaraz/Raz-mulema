@@ -768,7 +768,8 @@ if ($result4->num_rows > 0) {
   setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
   $time = strtotime($row4['datetime']);
 echo iconv('ISO-8859-2', 'UTF-8', strftime("%a %d %b %Y, %I:%M %p", strtotime($row4['datetime'])));
-echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$row4['id_embajador'].",".$row4['id_cliente'].");'>Ver</button></td></tr>";
+$embajador = isset($row4['id_embajador'])?$row4['id_embajador']:"0";
+echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$embajador.",".$row4['id_cliente'].");'>Ver</button></td></tr>";
   }
   }else{
       echo "<tr> <td colspan='6'>Aún no se han registrado ventas, ¡Genera algunas ahora mismo!</td></tr>";

@@ -369,7 +369,7 @@ if ($member_arr) {
              }
              echo' disabled>Seleccione</option>'.
             '</select>'
-             . "<button type='submit' id='botonCambioEsquema-". $aidi."' hidden>Cambiar</button>";
+             . "<button type='submit'  id='botonCambioEsquema-". $aidi."' hidden>Cambiar</button>";
     echo"</td>";
         //  echo '<td>'.get_user_meta($aidi,"Embajador", true).'</td>';
         echo    '';
@@ -469,7 +469,7 @@ echo "</td></tr></form>";
   //----------consulta a db inicio------------------------------------------------------------------------------
             
   
-include_once("conn.php");
+include("conn.php");
 $sql3 = "SELECT `mo`,`ye`, SUM(`monto_compra`) FROM `wp_mul_hipercubo` GROUP BY `mo`,`ye`;";
 //echo "<br>".$sql."<br>";
 $result3 = $conn->query($sql3);
@@ -705,38 +705,43 @@ if($result){
 if ($result->num_rows > 0) {
   // output data of each row
   while($row = $result->fetch_assoc()) {
-   echo"<form method='POST'>"
- . '<input name="pricingMul" value="si" hidden>'
-             . '<input name="itemId" value="'.$product->get_id().'" hidden/>'
-             . '<td><input type="number" name="esquemaA" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeA'].'"></td>'
-           . '<td><input type="number" name="esquemaB" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeB'].'"></td>'
-           . '<td><input type="number" name="esquemaC" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeC'].'"></td>'
+
+    echo'<form method="POST" id="form'.$product->get_id().'" >'
+ . '<input name="pricingMul" id="pricingMul'.$product->get_id().'" value="si" hidden>'
+             . '<input name="itemId" id="itemId'.$product->get_id().'" value="'.$product->get_id().'" hidden/>'
+             . '<td><input type="number" name="esquemaA" id="esquemaA'.$product->get_id().'" form="form'.$product->get_id().'" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeA'].'"></td>'
+           . '<td><input type="number" name="esquemaB" id="esquemaB'.$product->get_id().'" form="form'.$product->get_id().'" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeB'].'"></td>'
+           . '<td><input type="number" name="esquemaC" id="esquemaC'.$product->get_id().'" form="form'.$product->get_id().'" onchange="cambioEsquema('.$product->get_id().')" value="'.$row['porcentajeC'].'">'
            ;
                 
             
   }
   }else{
   
-      echo"<form method='POST'>"
- . '<input name="pricingMul" value="si" hidden>'
-             . '<input name="itemId" value="'.$product->get_id().'" hidden/>'
-             . '<td><input type="number" name="esquemaA" onchange="cambioEsquema('.$product->get_id().')" value="50"></td>'
-           . '<td><input type="number" name="esquemaB" onchange="cambioEsquema('.$product->get_id().')" value="35"></td>'
-           . '<td><input type="number" name="esquemaC" onchange="cambioEsquema('.$product->get_id().')" value="20">'
+     echo'<form method="POST" id="form'.$product->get_id().'">'
+ . '<input name="pricingMul" id="pricingMul'.$product->get_id().'"  value="si" hidden>'
+             . '<input name="itemId" id="itemId'.$product->get_id().'" value="'.$product->get_id().'" hidden/>'
+             . '<td><input type="number" name="esquemaA" id="esquemaA'.$product->get_id().'" form="form'.$product->get_id().'"  onchange="cambioEsquema('.$product->get_id().')" value="50"></td>'
+           . '<td><input type="number" name="esquemaB" id="esquemaB'.$product->get_id().'" form="form'.$product->get_id().'" onchange="cambioEsquema('.$product->get_id().')" value="35"></td>'
+           . '<td><input type="number" name="esquemaC" id="esquemaC'.$product->get_id().'" form="form'.$product->get_id().'" onchange="cambioEsquema('.$product->get_id().')" value="20">'
            ;
   }
   }else{
   
-      echo"<form method='POST'>"
- . '<input name="pricingMul" value="si" hidden>'
-             . '<input name="itemId" value="'.$product->get_id().'" hidden/>'
-             . '<td><input type="number" name="esquemaA" onchange="cambioEsquema('.$product->get_id().')" value="50"></td>'
-           . '<td><input type="number" name="esquemaB" onchange="cambioEsquema('.$product->get_id().')" value="35"></td>'
-           . '<td><input type="number" name="esquemaC" onchange="cambioEsquema('.$product->get_id().')" value="20">'
+      echo'<form method="POST" id="form'.$product->get_id().'">'
+ . '<input name="pricingMul" id="pricingMul'.$product->get_id().'"  value="si" hidden>'
+             . '<input name="itemId" id="itemId'.$product->get_id().'" value="'.$product->get_id().'" hidden/>'
+             . '<td><input type="number" name="esquemaA"  id="esquemaA'.$product->get_id().'"  form="form'.$product->get_id().'" onchange="cambioEsquema('.$product->get_id().')" value="50"></td>'
+           . '<td><input type="number" name="esquemaB" id="esquemaB'.$product->get_id().'" form="form'.$product->get_id().'" onchange="cambioEsquema('.$product->get_id().')" value="35"></td>'
+           . '<td><input type="number" name="esquemaC" id="esquemaC'.$product->get_id().'" form="form'.$product->get_id().'" onchange="cambioEsquema('.$product->get_id().')" value="20">'
            ;
   }
-
-echo "<button type='submit' id='botonCambioEsquema-". $product->get_id()."' hidden>Cambiar</button></td>"
+/*
+echo '<button type="button" form="form'.$product->get_id().'"  onclick="cambioesquemav('.$product->get_id().')" id="botonCambioEsquema-'. $product->get_id()."' hidden>Cambiar</button></td>"
+        . '</form>';
+ * 
+ */
+  echo "<button type='button' onclick='cambioesquemav(".$product->get_id().")' id='botonCambioEsquema-". $product->get_id()."' hidden>Cambiar</button></td>"
         . '</form>';
 echo "</tr>";
     endwhile; endif; wp_reset_postdata();
@@ -796,7 +801,8 @@ if ($result4->num_rows > 0) {
   setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
   $time = strtotime($row4['datetime']);
 echo iconv('ISO-8859-2', 'UTF-8', strftime("%a %d %b %Y, %I:%M %p", strtotime($row4['datetime'])));
-echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$row4['id_embajador'].",".$row4['id_cliente'].");'>Ver</button></td></tr>";
+$embajador = isset($row4['id_embajador'])?$row4['id_embajador']:"0";
+echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$embajador."0,".$row4['id_cliente'].");'>Ver</button></td></tr>";
   }
   }else{
       echo "<tr> <td colspan='6'>Aún no se han registrado ventas, ¡Genera algunas ahora mismo!".get_current_user_id()."</td></tr>";
@@ -809,8 +815,7 @@ echo "</td><td><button onclick='verMul(".$row4['id_compra'].",".$row4['id_embaja
     </tbody>
    </table>
          <script>
-function verMul(cual,emb,cli){
- console.log(cual);  
+function verMul(cual,emb,cli){ console.log(cual);  
   document.getElementById("gris-mul").style.display= "block";
 
         
@@ -909,6 +914,26 @@ setTimeout(function() {
   invisibilizarmanita3();
 }, delayInMilliseconds);
 }
+}
+function cambioesquemav(cualaidi){
+    $.post(window.location.href,{
+        itemId: $("#itemId"+cualaidi).val(),
+        pricingMul: $("#pricingMul"+cualaidi).val(),
+        esquemaA: $("#esquemaA"+cualaidi).val(),
+        esquemaB: $("#esquemaB"+cualaidi).val(),
+        esquemaC: $("#esquemaC"+cualaidi).val()
+        }, 
+    function(data, status){
+    
+      if(true){
+          console.log(status);
+         if(status=="success"){
+           $("#botonCambioEsquema-"+cualaidi).hide();  
+         }
+      }
+      
+      
+    });
 }
 </script>
 <?php
