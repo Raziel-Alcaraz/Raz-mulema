@@ -33,5 +33,25 @@ update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
 update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
 return($coupon_code);
 }
+function crearExtra($category, $cuanto, $id){
+           $args = array(
+        'post_type'      => 'product',
+        'posts_per_page' => 100,
+          'product_cat'    =>  $category      
+    );
+         $loop = new WP_Query( $args );
+    $ids="";
+while ( $loop->have_posts() ) : $loop->the_post();
+        global $product;
+       // echo '<br /><a href="'.get_permalink().'">-'.get_the_title().'</a>';
+        
+       
+        $ids.=$product->get_id().",";
+               
+    endwhile;
+    $ids=substr_replace($ids ,"", -1);
+   return crearCupon($cuanto,$ids, $id);
+
+}
 //4f0f5a97
 //5e89595b

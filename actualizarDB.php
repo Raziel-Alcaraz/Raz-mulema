@@ -1,7 +1,7 @@
 <?php
 
 function actualizarDB(){
-    include_once("conn.php");
+    include("conn.php");
 if ( $conn->query( "DESCRIBE `wp_mul_hipercubo`" ) ) {
     // my_table exists
     echo "hipercubo existe";
@@ -115,7 +115,30 @@ if ( $conn->query( "DESCRIBE `wp_mul_schemes`" ) ) {
     
 }else{
   
-    $siquel = "CREATE TABLE  `".$base."`.`wp_mul_schemes` ( `id_usr` INT NOT NULL ,  `nombreesquema` VARCHAR(30) , PRIMARY KEY (`id_usr`)) ENGINE = InnoDB; ";
+    $siquel = "CREATE TABLE  `".$base."`.`wp_mul_schemes` ( `id_scheme` INT NOT NULL AUTO_INCREMENT,`id_usr` INT NOT NULL ,  `nombreesquema` VARCHAR(30) , PRIMARY KEY (`id_scheme`)) ENGINE = InnoDB; ";
+$result = $conn->query($siquel);
+echo $siquel ."<br><br>";
+die($siquel);
+if($result){
+ var_dump($result);
+}else{
+    var_dump($siquel);
+   echo"<br><br>NO RESULT__________-------------------";
+}
+ 
+}
+}
+actualizarDBPriceExtras();
+function actualizarDBPriceExtras(){
+    include("conn.php");
+if ( $conn->query( "DESCRIBE `wp_mul_extra`" ) ) {
+    // my_table exists
+  //  echo "pricing existe";
+  
+    
+}else{
+  
+    $siquel = "CREATE TABLE  `".$base."`.`wp_mul_extra` ( `id_extra` INT NOT NULL AUTO_INCREMENT,`id_usr` INT(11) ,  `categoria` VARCHAR(30) ,  `valor` INT(11), PRIMARY KEY (`id_extra`)) ENGINE = InnoDB; ";
 $result = $conn->query($siquel);
 echo $siquel ."<br><br>";
 die($siquel);

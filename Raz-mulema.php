@@ -30,11 +30,14 @@ function mul_auto_add_coupons( $cart_object ) {
 window.addEventListener('error', function(event) {console.log('algo se rompió, recargando');location.reload(); })
 "
             . "</script>";
-if(count(WC()->cart->get_cart_contents())<=count(WC()->cart->get_applied_coupons())){
+if(count(WC()->cart->get_cart_contents())<count(WC()->cart->get_applied_coupons())){
     return;
 }
   //WC()->cart->remove_coupons();
     //var_dump(WC()->cart->get_cart_for_session());
+$doonce=true;
+include_once("pricing.php");
+         include_once("crearCupones.php");
      foreach ( WC()->cart->get_cart_for_session() as $cart_item ) {
          
          //echo "--------------------PROD:";
@@ -46,8 +49,7 @@ if(count(WC()->cart->get_cart_contents())<=count(WC()->cart->get_applied_coupons
 
   //var_dump(WC()->cart->get_applied_coupons());
     if(!WC()->cart->has_discount(get_current_user_id()."-".$key)){
- include_once("pricing.php");
-         include_once("crearCupones.php");
+ 
 	   $esquema_usuario = mul_get_scheme(get_current_user_id());
 	   //echo "<br>0---";
 	   //var_dump($esquema_usuario);
@@ -62,8 +64,14 @@ if(count(WC()->cart->get_cart_contents())<=count(WC()->cart->get_applied_coupons
            
        WC()->cart->apply_coupon( $cupon_creado );
     }
-   
+   if(mul_get_extra(get_current_user_id(), "cosmeticos")>0 && $doonce){
+     $cupon_creado = crearExtra("cosmeticos", mul_get_extra(get_current_user_id(), "cosmeticos"), get_current_user_id());
+     WC()->cart->apply_coupon( $cupon_creado );   
+     
+     $doonce=false;
     }
+    }
+    
 	}
 }
 function mulema_include_custom_jquery() {
@@ -277,6 +285,11 @@ die();
         include_once("pricing.php");
         //cambiar esquema-------------------------------------------------------------------
         mul_set_scheme($_POST['username'], $_POST['esquema']);
+        if(isset($_POST["extra"])){
+            mul_set_extra($_POST['username'], "cosmeticos", $_POST["extra"]);
+        }
+        
+        
      }else if( isset( $_POST['pricingMul'] ) &&
             isset( $_POST['itemId'] )) {
       include("conn.php");  

@@ -273,7 +273,7 @@ if ($result->num_rows > 0) {
         <table  id="mulemaListas2tab"  class="styled-table">
     <thead>
         <tr>
-            <th class="centrar" colspan="6">Red Vive Elite<div id="manita"><div id="estela"></div><i class="bi bi-hand-index"></i></div></th>
+            <th class="centrar" colspan="7">Red Vive Elite<div id="manita"><div id="estela"></div><i class="bi bi-hand-index"></i></div></th>
             
         </tr>
         <tr>
@@ -285,6 +285,7 @@ if ($result->num_rows > 0) {
         <th onclick="sortTable(4,'mul-Nvos')">Esquema</th>
         <!--    <th onclick="sortTable(5,'mul-Nvos')">Embajador</th> -->
         <th onclick="sortTable(5,'mul-Nvos')">Ventas</th>
+        <th onclick="sortTable(6,'mul-Nvos')">Extra Cosméticos</th>
         </tr>
     </thead>
     <tbody id="mul-Nvos">
@@ -309,7 +310,7 @@ if ($member_arr) {
        update_user_meta($aidi,"IngresoMeta",time());
    }
    if(null !== $usuario->first_name && "" !== $usuario->first_name){
-      echo '<tr '.$clase."><form method='POST'>";
+      echo '<tr '.$clase."><form method='POST'  id='forma-".$aidi."'></form>";
     //  echo '<td>'.$aidi.'</td>';
           echo '<td>'.$usuario->first_name . ' ' . $usuario->last_name.'</td>';
           echo "<a class='invisible'>".(time() - intval(get_user_meta($aidi,"IngresoMeta", true)))."</a>";
@@ -345,10 +346,10 @@ if ($member_arr) {
           }
           echo "<td>";
      echo "<a class='invisible'>".mul_get_scheme($aidi)."</a>"
-     . '<input name="esquemaMul" value="si" hidden/>'
-             . '<input name="username" value="'.$aidi.'" hidden/>'
-             . '<select name="esquema" onchange="cambioEsquema('.$aidi.')">
-                <option value="C"';
+     . "<input name='esquemaMul' value='si'  form='forma-".$aidi."' hidden/>"
+             . "<input  name='username' value='".$aidi."' form='forma-".$aidi."'  hidden/>"
+             . "<select name='esquema' onchange='cambioEsquema(".$aidi.")' form='forma-".$aidi."'>"
+                ."<option value='C'";
              if(mul_get_scheme($aidi)=="C"){
                  echo "selected";
              }
@@ -368,18 +369,9 @@ if ($member_arr) {
                  echo " selected";
              }
              echo' disabled>Seleccione</option>'.
-            '</select>'
-             . "<button type='submit'  id='botonCambioEsquema-". $aidi."' hidden>Cambiar</button>";
+            '</select>';
     echo"</td>";
-        //  echo '<td>'.get_user_meta($aidi,"Embajador", true).'</td>';
-        echo    '';
-         if($clase == 'class="active-row"'){
-     $clase = "";
-   }else if($clase == ""){
-  $clase = 'class="active-row"';   
-   }
-   }
-  echo "<td>";
+    echo "<td>";
   include_once("conn.php");
 
 $sql3 = "SELECT SUM(`monto_compra`) as monto_compra FROM `wp_mul_hipercubo` WHERE `".$tipoID."` = $aidi;";
@@ -398,7 +390,42 @@ if ($result3->num_rows > 0) {
   
   }
   }
-echo "</td></tr></form>";
+echo "</td>";
+     echo "<td>"; 
+     echo "<a class='invisible'>".mul_get_extra($aidi, "cosmeticos")."</a>"
+             . "<select name='extra' onchange='cambioEsquema(".$aidi.")' form='forma-".$aidi."'>"
+                ."<option value='0' ";
+             if(mul_get_extra($aidi, "cosmeticos")==0){
+                 echo " selected ";
+             }
+             echo ">0%</option>".
+                "<option value='5' ";
+              if(mul_get_extra($aidi, "cosmeticos")==5){
+                 echo " selected ";
+             }
+             echo">5%</option>".
+                "<option value='10' ";
+              if(mul_get_extra($aidi, "cosmeticos")==10){
+                 echo " selected ";
+             }
+             echo">10%</option>".
+                "<option value='0' ";
+              if(mul_get_extra($aidi, "cosmeticos")!=5 && mul_get_extra($aidi, "cosmeticos")!=10 &mul_get_extra($aidi, "cosmeticos")!=0){
+                 echo " selected ";
+             }
+             echo" disabled>Seleccione</option>".
+            "</select>"
+             . "<button type='submit'  id='botonCambioEsquema-". $aidi."' form='forma-".$aidi."' hidden>Cambiar</button>";
+    echo"</td>";
+        //  echo '<td>'.get_user_meta($aidi,"Embajador", true).'</td>';
+       
+         if($clase == 'class="active-row"'){
+     $clase = "";
+   }else if($clase == ""){
+  $clase = 'class="active-row"';   
+   }
+   }
+  echo"</tr>";
      
 //_-------------------consulta a db FIN------------------------------------------------------------------------------     
  
@@ -786,7 +813,7 @@ if ($result4->num_rows > 0) {
       }
       else{
         
-        
+        $user2=array();
                 $user2["first_name"]= "N/";
                 $user2["last_name"]="A" ;
                 $user2 =(object)$user2;

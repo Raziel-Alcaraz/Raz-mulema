@@ -98,6 +98,7 @@ $result = $conn->query($sql);
 
 if ($conn->affected_rows>0) {
     echo"Cambiado el esquema";
+    return true;
 //var_dump($conn->affected_rows);
      //var_dump($sql);
 }else{
@@ -109,9 +110,57 @@ if ($conn->affected_rows>0) {
    //var_dump($sql2);
   //die("no Error");
 }else{
+    var_dump($sql);
+var_dump($sql2);
+    die("Listo: 6F0F");
+}
+}
+
+}
+function mul_get_extra($id_usr, $categoria){
+  include("conn.php");
+    $retorno = "A";
+   $sql = "SELECT `valor` FROM `wp_mul_extra` WHERE `id_usr` =".$id_usr." AND `categoria` = '".$categoria."';";
+$result = $conn->query($sql);
+if($result){
+if ($result->num_rows > 0) {
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+    $retorno= $row["valor"];
+  }
+  return intval($retorno);
+} else {  
+   
+  return 0;
+}
+} else {
+  
+  return 0;
+}
+
+}
+function mul_set_extra($id_usr, $categoria, $extra){
+    include("conn.php");
+    $retorno = "";
+   $sql = "UPDATE `wp_mul_extra` SET `valor`=".$extra." WHERE `id_usr`='".$id_usr."' AND `categoria`='".$categoria."';";
+$result = $conn->query($sql);
+
+if ($conn->affected_rows>0) {
+    echo"Cambiado el esquema";
+//var_dump($conn->affected_rows);
+     //var_dump($sql);
+}else{
+    $sql2 = "INSERT INTO `wp_mul_extra` (`id_usr`,`categoria`,`valor`) VALUES(".$id_usr." , '".$categoria."', ".$extra.");";
+$result2 = $conn->query($sql2);
+
+if ($conn->affected_rows>0) {
     //var_dump($sql);
-    //var_dump($sql2);
-    die("Error: Contacte a soporte. Código de error: 6F0F");
+   //var_dump($sql2);
+  //die("no Error");
+}else{
+var_dump($sql);
+var_dump($sql2);
+    die("Listo: 6G0G");
 }
 }
 
